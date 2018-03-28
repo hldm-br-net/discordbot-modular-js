@@ -1,0 +1,9 @@
+{
+    "token"  : "",
+    "prefix" : "!",
+    "steamapikey" : "",
+    "sqlitedb" : "C:/gameservers/scstats/scstats.db",
+    "gameserverip" : "",
+    "gameserverport" : "",
+    "gstimeout" : "5000"
+}
