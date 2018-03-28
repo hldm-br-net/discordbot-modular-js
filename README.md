@@ -1,3 +1,5 @@
+## WORK IN PROGRESS!!!
+
 Yet another discord bot made in NodeJS, written for use with HLDM-BR.NET
 Sven Co-op servers.
 
