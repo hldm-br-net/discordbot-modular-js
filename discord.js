@@ -1,13 +1,39 @@
+/**
+ * Guts - Discord bot made specially for HLDM-BR.NET by Rafael "R4to0" Alves.
+ * Based on 'gus.pl' by incognico.
+ * All rights reserved.
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to
+ * deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ */
+
 // Não mexa abaixo a não ser que você saiba o que está fazendo
 
+// A fazer: Trocar o sqlite3 por better-sqlite3
+
 // Bibliotecas
-const Discord = require("discord.js");
-const sqlite3 = require("sqlite3");
-const SteamID = require("steamid");
-const request = require("request");
+const Discord = require("discord.js");          // https://www.npmjs.com/package/discord.js
+const sqlite3 = require("sqlite3");             // https://www.npmjs.com/package/sqlite3
+const SteamID = require("steamid");             // https://www.npmjs.com/package/steamid
 const SteamAPI = require("steamapi");           // https://www.npmjs.com/package/steamapi
-const SourceQuery = require('sourcequery');     // https://www.npmjs.com/package/sourcequery
-const async = require('async');
+const SourceQuery = require("sourcequery");     // https://www.npmjs.com/package/sourcequery
+const async = require("async");                 // https://www.npmjs.com/package/async
+const fs = require("fs");
 
 const config = require("./config.json")
 const client = new Discord.Client();
@@ -15,8 +41,8 @@ const db = new sqlite3.Database(config.sqlitedb);
 const steam = new SteamAPI(config.steamapikey); // https://steamcommunity.com/dev/apikey
 const sq = new SourceQuery(config.gstimeout);
 
+// Steam ID Regex
 const SteamIDRegex = /^STEAM_(0:[01]:[0-9]+)$/;
-const IDRegex = /^0:[01]:[0-9]+$/;
 
 // Super shitty array for map data, because I don't have a PRO account to use wikidot API
 // mapname, scmdbname, thumb, mappic, desc
@@ -24,9 +50,9 @@ const MapData = [
     {
         'name': 'IO',
         'author': 'RNG',
-        'mapname': "io_v1", 
-        'scmdbname': "io", 
-        'thumb': "iomapheader2.png", 
+        'mapname': "io_v1",
+        'scmdbname': "io",
+        'thumb': "iomapheader2.png",
         'mappic': "0-iobeta111_1.jpg",
         'desc': "Somewhere in 22th century an important laboratory in the moon Io has gone all messed up and stupid, and its your job once again to \"fix\" things no matter the international or intergalactic impact it has."
     },
@@ -50,9 +76,15 @@ const MapData = [
     }
 ];
 
-function mapindex(map){
+/**
+ * Returns index for a map from the above array.
+ * 
+ * @param {string} map Map name
+ * @returns {number} int of the map array, or null if map does not exist in the array.
+ */
+function mapindex(map) {
     var index = MapData.findIndex((maparr) => maparr.mapname === map);
-    if (index == -1){
+    if (index == -1) {
         return null;
     }
     else {
@@ -60,17 +92,41 @@ function mapindex(map){
     }
 }
 
+/**
+ * Returns years, days, hours, mins and secs from int value.
+ * Does not display if result is 0.
+ * @param {number} value Time in seconds.
+ * @returns {string} Time in years, days, hours, mins and secs where each value is > 0.
+ */
+function converttime(value) {
 
+    const sec = Math.floor(value % 60);
+    const min = Math.floor((value % 3600) / 60);
+    const hrs = Math.floor((value % 86400) / 3600);
+    const dys = Math.floor((value % (86400 * 30)) / 86400);
+    const yrs = Math.floor((value / 31536000));
+    
+    const yShow = yrs > 0 ? yrs + (yrs == 1 ? " ano " : " anos ") : "";
+    const dShow = dys > 0 ? dys + (dys == 1 ? " dia " : " dias ") : "";
+    const hShow = hrs > 0 ? hrs + (hrs == 1 ? " hora " : " horas ") : "";
+    const mShow = min > 0 ? min + (min == 1 ? " min" : " mins") : "";
+
+    return yShow + dShow + hShow + mShow; 
+}
 
 // Inicia o bot
 client.on("ready", () => {
     // Loga no console
     console.log("Bot iniciado, há " + client.users.size + " usuários em " + client.channels.size + " salas com " + client.guilds.size + " canais.");
 
-    // Define o "playing a game"
+    // Define o "playing a game" (temporario)
     client.user.setActivity("Digite !ajuda");
 
 });
+
+client.on("guildCreate", guild => {
+    console.log(`New guild joined: ${guild.name} (id: ${guild.id}). This guild has ${guild.memberCount} members!`);
+  });
 
 // Loga no console se o bot for removido do server
 client.on("guildDelete", guild => {
@@ -83,6 +139,10 @@ client.on("message", async message => {
     if (message.author.bot)
         return;
 
+    if (message.channel.id != config.commchannel) {
+        return;
+    }
+
     // Ignora mensagens sem prefixo
     if (message.content.indexOf(config.prefix) !== 0)
         return;
@@ -94,6 +154,7 @@ client.on("message", async message => {
     const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
     const command = args.shift().toLowerCase();
 
+    //if ( ){}
     // Ping pong
     // Responde com "Pingando" e depois edita com o tempo de resposta em relação a mensagem anterior a edição
     if (command === "ping") {
@@ -109,19 +170,12 @@ client.on("message", async message => {
             return message.reply("Informe um mapa.");
 
         const msg = await message.channel.send("`Aguarde...`");
-        var mapthumb;
         const index = mapindex(param);
         if (index == null)
             return msg.edit("`Informação indisponível`");
 
         // Se não tiver thumb, deixar em branco
-        if (MapData[index].thumb === ''){
-            mapthumb = ""
-        }
-        else {
-            mapthumb = "http://scmapdb.wdfiles.com/local--files/map:" + MapData[index].scmdbname + "/" + MapData[index].thumb;
-        }
-        
+        const mapthumb = (index === null) ? "" : "http://scmapdb.wdfiles.com/local--files/map:" + MapData[index].scmdbname + "/" + MapData[index].thumb;
         const embed = new Discord.RichEmbed()
             .setColor(0x00AE86) // cor da faixa na esquerda
             .setAuthor(MapData[index].author) // string e imagem antes do nome
@@ -131,13 +185,7 @@ client.on("message", async message => {
             .setThumbnail(mapthumb) // thumb lado direito superior
             .setFooter("Powered by scmapdb.com and Wikidot", "http://scmapdb.wdfiles.com/local--files/site:images/scmapdb.gif") // rodapé
             .setImage("http://scmapdb.wdfiles.com/local--files/map:" + MapData[index].scmdbname + "/" + MapData[index].mappic) // imagem que fica apos a descrição
-
             .setTimestamp() // assina com a data atual no rodapé
-
-        //.addField("This is a field title, it can hold 256 characters", "This is a field value, it can hold 2048 characters.")
-        //.addField("Inline Field", "They can also be inline.", true)
-        //.addBlankField(true)
-        //.addField("Inline Field 3", "You can have a maximum of 25 fields.", true);
 
         msg.edit({ embed }); // envia msg
     }
@@ -153,107 +201,93 @@ client.on("message", async message => {
             return message.reply("Informe um jogador (nome ou SteamID).");
 
         // shit
-        var sid, sqldata, sumdata, bandata;
+        var tmp;
 
-        var msg = await message.channel.send("`Consultando banco de dados...`");
+        var msg = await message.channel.send("`Aguarde...`");
 
         // Consulta SQLITE
-        if (SteamIDRegex.test(param)) // testa se é uma steamid
-        {
-            console.log(Date.now() + ": STEAMID informado.")
-            var consulta = function (callback) {
-                console.log(Date.now() + ": Inicia consulta SQLITE com STEAMID.")
-                db.get("SELECT steamid,name,ROUND(score,0) as pontos,geo,deaths FROM stats WHERE steamid = \"" + param.replace("STEAM_", "") + "\" ORDER BY score DESC LIMIT 1", function (err, res) {
-                    callback(err, res);
+        // NOTA: Calcular posição no rank
+        async.series([
+            function (callback) {
+                if (SteamIDRegex.test(param)) { //steamid
+                    console.log(Date.now() + ": Inicia consulta SQLITE com STEAMID.");
+                    db.get("SELECT steamid, name, ROUND(score,0) as pontos, deaths, ROUND(scoregain,0) as ultsganho, ROUND(deathgain,0) as ultdhs, geo, datapoints, strftime('%d/%m/%Y', seen) as ultvisto FROM stats WHERE steamid = \"" + param.replace("STEAM_", "") + "\" ORDER BY score DESC LIMIT 1", function (err, sqdata) {
+                        tmp = sqdata;
+                        if (!sqdata) return callback("nodata", null);
+                        callback(err, sqdata);
+                        console.log(Date.now() + ": Termina consulta SQLITE com STEAMID.");
+                    });
+                }
+                else { // nome
+                    console.log(Date.now() + ": Inicia consulta SQLITE com NOME.");
+                    db.get("SELECT steamid, name, ROUND(score,0) as pontos, deaths, ROUND(scoregain,0) as ultsganho, ROUND(deathgain,0) as ultdhs, geo, datapoints, strftime('%d/%m/%Y', seen) as ultvisto FROM stats WHERE name LIKE \"%" + param + "%\" ORDER BY score DESC LIMIT 1", function (err, sqdata) {
+                        tmp = sqdata;
+                        if (!sqdata) return callback("nodata", null);
+                        callback(err, sqdata);
+                        console.log(Date.now() + ": Termina consulta SQLITE com NOME.");
+                    });
+                }
+            },
+            function (callback) { //Nota: precisa lidar com erros de api
+                const sid = new SteamID("STEAM_" + tmp.steamid);
+                console.log(Date.now() + ": Inicia consulta STEAMID SUMMARY.");
+                steam.getUserSummary(sid.getSteamID64()).then(plrsum => {
+                    callback(null, plrsum);
+                    console.log(Date.now() + ": Retorna consulta STEAMID SUMMARY.");
                 });
-            };
-        }
-        else {
-            console.log(Date.now() + ": NOME informado.")
-            var consulta = function (callback) {
-                console.log(Date.now() + ": Inicia consulta SQLITE com NOME.")
-                db.get("SELECT steamid,name,ROUND(score,0) as pontos,geo,deaths FROM stats WHERE name LIKE \"%" + param + "%\" ORDER BY score DESC LIMIT 1", function (err, res) {
-                    callback(err, res);
+            },
+            function (callback) { //Nota: precisa lidar com erros de api
+                const sid = new SteamID("STEAM_" + tmp.steamid);
+                console.log(Date.now() + ": Inicia consulta STEAMID BANS.");
+                steam.getUserBans(sid.getSteamID64()).then(plrbans => {
+                    callback(null, plrbans);
+                    console.log(Date.now() + ": Retorna consulta STEAMID BANS.");
                 });
-            };
-        }
-
-        consulta(function (err, res) {
-            if (err) {
-                console.log(Date.now() + ": SQLITE retorna ERRO.")
-                return msg.edit("`ERRO NA CONSULTA!!!`");
             }
-            else if (res == null) {
+        ],
+        function (err, data) {
+            //console.log(data);
+            if (err === "nodata") {
                 console.log(Date.now() + ": SQLITE retorna resultado VAZIO.")
                 return msg.edit("`Sem resultados`");
             }
+            else if (err) {
+                console.log(Date.now() + ": SQLITE retorna ERRO.")
+                return msg.edit("`Erro na consulta!!!`");
+            }
             else {
-                console.log(Date.now() + ": SQLITE retorna resultado.")
-                sqldata = res;
-                msg.edit("SteamID: " + res.steamid + ". Pontos: " + res.pontos);
-                steamdata();
+                console.log(Date.now() + ": Exibe resultado.")
+                const embed = new Discord.RichEmbed();
+                    embed.setColor(0x00AE86) // cor da faixa na esquerda
+                    embed.setTimestamp(fs.statSync(config.sqlitedb).mtime) // assina com a data atual no rodapé
+                    embed.setThumbnail(data[1].avatar.large) // thumb lado direito superior
+                    embed.addField("Nome", "[" + data[0].name + "](" + data[1].profileURL + ")", true)
+                    embed.addField("País", ":flag_" + data[0].geo.toLowerCase() + ":", true)
+                    embed.addField("Tempo no servidor", data[0].datapoints*30 > 0 ? converttime(data[0].datapoints*30) : "-", true)
+                    embed.addField("Última vez visto", data[0].ultvisto === null ? "Desconhecido" : data[0].ultvisto, true)
+                    if (data[0].pontos > 0 || data[0].deaths > 0) {
+                        embed.addField("Pontos", data[0].pontos + (data[0].ultsganho > 0 ? " *(+" + data[0].ultsganho + ")*" : ""), true)
+                        embed.addField("Mortes", data[0].deaths + (data[0].ultdhs > 0 ? " *(+" + data[0].ultdhs + ")*" : ""), true)
+                        embed.addField("Relação pontos por mortes", (data[0].pontos / data[0].deaths).toFixed(2), true)
+                        embed.addBlankField(true)
+
+                    }
+                    embed.setFooter("Última atualização")
+                    if (data[2].vacBanned) {
+                        embed.addField("Banido por VAC", "Sim *(" + data[2].vacBans + ")*", true)
+                        embed.addField("Último banimento VAC", converttime(data[2].daysSinceLastBan*86400), true)
+                    }
+                    if (data[2].communityBanned) {
+                        embed.addField("Banido da Comunidade Steam", "Sim", true)
+                    }
+                    if (data[2].economyBan == "banned"){
+                        embed.addField("Banido de Trade", "Sim", true)
+
+                    }
+                msg.edit({ embed }); // envia msg
             }
         });
-
-        async function steamdata() {
-            sid = new SteamID("STEAM_" + sqldata.steamid);
-            console.log(Date.now() + ": Inicia consulta STEAMID SUMMARY.")
-            sumdata = await steam.getUserSummary(sid.getSteamID64()).then(summary => {
-                console.log(Date.now() + ": Retorna consulta STEAMID SUMMARY.")
-                return { 
-                    avatar: summary.avatar.large,
-                    created: summary.created,
-                    steamname: summary.nickname
-                };
-            });
-        }
-
-        async function banfetch() {
-            sid = new SteamID("STEAM_" + sqldata.steamid);
-            console.log(Date.now() + ": Inicia consulta STEAMID BAN.")
-            bandata = await steam.getUserBans(sid.getSteamID64()).then(baninfo => {
-                console.log(Date.now() + ": Retorna consulta STEAMID BAN.")
-                return {
-                    vacBans: baninfo.vacBans,
-                    daysSinceLastBan: baninfo.daysSinceLastBan,
-                    communityBanned: baninfo.communityBanned,
-                    gameBans: baninfo.gameBans
-                };
-            });
-        }
-
-
-        // Consulta Steam API
-        //msg.edit( "`Consultando Steam API...`" );
-        //const sid = new SteamID( param );
-
-        /*var usersum = steam.getUserSummary( sid.getSteamID64() ).then( summary =>
-        {
-            return { 
-                avatar: summary.avatar.large,
-                created: summary.created,
-                steamname: summary.nickname
-            };
-        });
-        var userbans = steam.getUserBans( sid.getSteamID64() ).then( baninfo =>
-        {
-            return {
-                vacBans: baninfo.vacBans,
-                daysSinceLastBan: baninfo.daysSinceLastBan,
-                communityBanned: baninfo.communityBanned,
-                gameBans: baninfo.gameBans
-            };
-        });*/
-
-        //console.log( usersum );
-        //console.log( userbans );
-
-        //message.channel.send( row.nane + ": " );
-        //console.log(row.steamid + ": " + row.pontos);
-
-        //return msg.edit( "SteamID: " + row.steamid + ". Pontos: " + row.pontos );
         return;
-        //}); // termino sqlite
         //db.close();
     }
 
@@ -261,6 +295,7 @@ client.on("message", async message => {
         const msg = await message.channel.send("`Aguarde...`");
         console.log(Date.now() + ": Inicia conexão com servidor.");
         sq.open(config.gameserverip, config.gameserverport);
+
         async.series([
             function (callback) {
                 console.log(Date.now() + ": Inicia consulta Source Query SERVERINFO.");
@@ -292,22 +327,14 @@ client.on("message", async message => {
             else {
                 var jogadores = "Não há jogadores no servidor.";
                 if (res[1].length > 0) {
-                        jogadores = "";
-                        for (i = 0; i < res[1].length; i++){
-                            jogadores = jogadores + res[1][i].name + "\n";
-                            //console.log(res[1][i].name);
-                        }
+                    jogadores = "";
+                    for (i = 0; i < res[1].length; i++) {
+                        jogadores = jogadores + res[1][i].name + "\n";
+                    }
                 }
                 //console.log(mapindex(res[0].map));
                 const index = mapindex(res[0].map);
-                var mapthumb;
-                if (index == null)
-                {
-                    mapthumb = "https://steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/225840/1ef26a0b4dbabb81d8d1682ffd674bc3c71a313f_thumb.jpg";
-                }
-                else {
-                    mapthumb = "http://scmapdb.wdfiles.com/local--files/map:" + MapData[index].scmdbname + "/" + MapData[index].mappic;
-                }
+                const mapthumb = (index === null) ? "https://steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/225840/1ef26a0b4dbabb81d8d1682ffd674bc3c71a313f_thumb.jpg" : "http://scmapdb.wdfiles.com/local--files/map:" + MapData[index].scmdbname + "/" + MapData[index].mappic;
                 const embed = new Discord.RichEmbed()
                     .setColor(0x00AE86) // cor da faixa na esquerda
                     .setTimestamp() // assina com a data atual no rodapé
@@ -317,11 +344,9 @@ client.on("message", async message => {
                     .addField("Próximo", res[2][17].value, true)
                     .addField("IP", "[" + config.gameserverip + ":" + config.gameserverport + "](steam://connect/" + config.gameserverip + ":" + config.gameserverport + ")", true)
                     .addField("Jogadores no servidor", jogadores)
-                    .setFooter("Powered by Steam")
-
+                    .setFooter("Última atualização")
                 msg.edit({ embed }); // envia msg
             }
-
         });
     }
 

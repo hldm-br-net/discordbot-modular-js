@@ -13,3 +13,4 @@ Required modules:
 - steamapi
 - sourcequery
 - async
+- fs

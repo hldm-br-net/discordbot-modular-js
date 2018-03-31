@@ -5,5 +5,8 @@
     "sqlitedb" : "C:/gameservers/scstats/scstats.db",
     "gameserverip" : "",
     "gameserverport" : "",
-    "gstimeout" : "5000"
+    "gstimeout" : "5000",
+    "chatchannel" : "",
+    "commchannel" : "",
+    "statuschannel" : ""
 }
