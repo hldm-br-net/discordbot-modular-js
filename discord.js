@@ -27,13 +27,14 @@
 // A fazer: Trocar o sqlite3 por better-sqlite3
 
 // Bibliotecas
-const Discord = require("discord.js");          // https://www.npmjs.com/package/discord.js
-const sqlite3 = require("sqlite3");             // https://www.npmjs.com/package/sqlite3
-const SteamID = require("steamid");             // https://www.npmjs.com/package/steamid
-const SteamAPI = require("steamapi");           // https://www.npmjs.com/package/steamapi
-const SourceQuery = require("sourcequery");     // https://www.npmjs.com/package/sourcequery
-const async = require("async");                 // https://www.npmjs.com/package/async
-const fs = require("fs");
+const Discord = require('discord.js');          // https://www.npmjs.com/package/discord.js
+const sqlite3 = require('sqlite3');             // https://www.npmjs.com/package/sqlite3
+const SteamID = require('steamid');             // https://www.npmjs.com/package/steamid
+const SteamAPI = require('steamapi');           // https://www.npmjs.com/package/steamapi
+const SourceQuery = require('sourcequery');     // https://www.npmjs.com/package/sourcequery
+const async = require('async');                 // https://www.npmjs.com/package/async
+const fs = require('fs');
+//const isIp = require('is-ip');                  // https://www.npmjs.com/package/is-ip
 
 const config = require("./config.json")
 const client = new Discord.Client();
@@ -41,7 +42,7 @@ const db = new sqlite3.Database(config.sqlitedb);
 const steam = new SteamAPI(config.steamapikey); // https://steamcommunity.com/dev/apikey
 const sq = new SourceQuery(config.gstimeout);
 
-// Steam ID Regex
+// SteamID Regex
 const SteamIDRegex = /^STEAM_(0:[01]:[0-9]+)$/;
 
 // Super shitty array for map data, because I don't have a PRO account to use wikidot API
@@ -106,10 +107,10 @@ function converttime(value) {
     const dys = Math.floor((value % (86400 * 30)) / 86400);
     const yrs = Math.floor((value / 31536000));
     
-    const yShow = yrs > 0 ? yrs + (yrs == 1 ? " ano " : " anos ") : "";
-    const dShow = dys > 0 ? dys + (dys == 1 ? " dia " : " dias ") : "";
-    const hShow = hrs > 0 ? hrs + (hrs == 1 ? " hora " : " horas ") : "";
-    const mShow = min > 0 ? min + (min == 1 ? " min" : " mins") : "";
+    const yShow = yrs > 0 ? yrs + (yrs == 1 ? "a " : "a ") : "";
+    const dShow = dys > 0 ? dys + (dys == 1 ? "d " : "d ") : "";
+    const hShow = hrs > 0 ? hrs + (hrs == 1 ? "h " : "h ") : "";
+    const mShow = min > 0 ? min + (min == 1 ? "m" : "m") : "";
 
     return yShow + dShow + hShow + mShow; 
 }
@@ -203,7 +204,7 @@ client.on("message", async message => {
         // shit
         var tmp;
 
-        var msg = await message.channel.send("`Aguarde...`");
+        var msg = await message.channel.send("`Buscando...`");
 
         // Consulta SQLITE
         // NOTA: Calcular posição no rank
@@ -211,7 +212,7 @@ client.on("message", async message => {
             function (callback) {
                 if (SteamIDRegex.test(param)) { //steamid
                     console.log(Date.now() + ": Inicia consulta SQLITE com STEAMID.");
-                    db.get("SELECT steamid, name, ROUND(score,0) as pontos, deaths, ROUND(scoregain,0) as ultsganho, ROUND(deathgain,0) as ultdhs, geo, datapoints, strftime('%d/%m/%Y', seen) as ultvisto FROM stats WHERE steamid = \"" + param.replace("STEAM_", "") + "\" ORDER BY score DESC LIMIT 1", function (err, sqdata) {
+                    db.get("SELECT steamid, name, ROUND(score,0) as pontos, deaths, ROUND(scoregain,0) as ultsganho, ROUND(deathgain,0) as ultdhs, geo, datapoints, datapointgain, strftime('%d/%m/%Y', seen) as ultvisto FROM stats WHERE steamid = \"" + param.replace("STEAM_", "") + "\" ORDER BY score DESC LIMIT 1", function (err, sqdata) {
                         tmp = sqdata;
                         if (!sqdata) return callback("nodata", null);
                         callback(err, sqdata);
@@ -220,7 +221,7 @@ client.on("message", async message => {
                 }
                 else { // nome
                     console.log(Date.now() + ": Inicia consulta SQLITE com NOME.");
-                    db.get("SELECT steamid, name, ROUND(score,0) as pontos, deaths, ROUND(scoregain,0) as ultsganho, ROUND(deathgain,0) as ultdhs, geo, datapoints, strftime('%d/%m/%Y', seen) as ultvisto FROM stats WHERE name LIKE \"%" + param + "%\" ORDER BY score DESC LIMIT 1", function (err, sqdata) {
+                    db.get("SELECT steamid, name, ROUND(score,0) as pontos, deaths, ROUND(scoregain,0) as ultsganho, ROUND(deathgain,0) as ultdhs, geo, datapoints, datapointgain, strftime('%d/%m/%Y', seen) as ultvisto FROM stats WHERE name LIKE \"%" + param + "%\" ORDER BY score DESC LIMIT 1", function (err, sqdata) {
                         tmp = sqdata;
                         if (!sqdata) return callback("nodata", null);
                         callback(err, sqdata);
@@ -263,13 +264,13 @@ client.on("message", async message => {
                     embed.setThumbnail(data[1].avatar.large) // thumb lado direito superior
                     embed.addField("Nome", "[" + data[0].name + "](" + data[1].profileURL + ")", true)
                     embed.addField("País", ":flag_" + data[0].geo.toLowerCase() + ":", true)
-                    embed.addField("Tempo no servidor", data[0].datapoints*30 > 0 ? converttime(data[0].datapoints*30) : "-", true)
+                    embed.addField("Tempo no servidor", data[0].datapoints*30 > 0 ? converttime(data[0].datapoints*30) + (data[0].datapointgain*30 > 0 ? " *(+"+  converttime(data[0].datapointgain*30) + ")*" : "") : "-", true)
                     embed.addField("Última vez visto", data[0].ultvisto === null ? "Desconhecido" : data[0].ultvisto, true)
                     if (data[0].pontos > 0 || data[0].deaths > 0) {
                         embed.addField("Pontos", data[0].pontos + (data[0].ultsganho > 0 ? " *(+" + data[0].ultsganho + ")*" : ""), true)
                         embed.addField("Mortes", data[0].deaths + (data[0].ultdhs > 0 ? " *(+" + data[0].ultdhs + ")*" : ""), true)
-                        embed.addField("Relação pontos por mortes", (data[0].pontos / data[0].deaths).toFixed(2), true)
-                        embed.addBlankField(true)
+                        embed.addField("Relação pontos/mortes", (data[0].pontos / data[0].deaths).toFixed(2), true)
+                        embed.addField("Steam ID", "STEAM_" + data[0].steamid, true)
 
                     }
                     embed.setFooter("Última atualização")
@@ -292,7 +293,7 @@ client.on("message", async message => {
     }
 
     if (command === "status") {
-        const msg = await message.channel.send("`Aguarde...`");
+        const msg = await message.channel.send("`Consultando...`");
         console.log(Date.now() + ": Inicia conexão com servidor.");
         sq.open(config.gameserverip, config.gameserverport);
 
@@ -350,8 +351,8 @@ client.on("message", async message => {
         });
     }
 
-    if (command === "playagame") {
-
+    if (command === "hehu") {
+        return message.reply("hehu!");
     }
 
 
