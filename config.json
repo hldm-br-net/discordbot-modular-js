@@ -3,10 +3,12 @@
     "prefix" : "!",
     "steamapikey" : "",
     "sqlitedb" : "C:/gameservers/scstats/scstats.db",
-    "gameserverip" : "",
-    "gameserverport" : "",
-    "gstimeout" : "5000",
+    "gameserverip" : "191.232.179.200",
+    "gameserverport" : "1337",
+    "gstimeout" : "1000",
     "chatchannel" : "",
     "commchannel" : "",
-    "statuschannel" : ""
+    "statuschannel" : "",
+	"modsrole" : ""
+	
 }
