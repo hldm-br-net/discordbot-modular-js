@@ -1,7 +1,8 @@
 /**
  * Guts - Discord bot made specially for HLDM-BR.NET by Rafael "R4to0" Alves.
  * Based on 'gus.pl' by incognico.
- * All rights reserved.
+ * 
+ * Copyright(C) 2018 Rafael Alves
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -182,25 +183,44 @@ function MapMsg(map) {
 }
 
 /**
- * Returns years, days, hours, mins and secs from int value.
+ * Returns years, months, days, hours, mins and secs from int value.
+ * Limited by its max range:
+ *
+ * Seconds: 0-59
+ * Minutes: 0-59
+ * Hours: 0-23
+ * Days: 1-30
+ * Months: 1-12
+ *
  * Does not display if result is 0.
+ *
+ * Formula base
+ * hour in seconds: 60*60 = 3600
+ * day in seconds: 60*60*24 = 86400
+ * month in seconds: 60*60*24*30 = 2592000
+ * year in seconds: 60*60*24*30*12 = 31104000
+ *
+ * ... but a year is 31536000 compared to previous calculation (diff 432000 = 5 days)
+ *
  * @param {number} value Time in seconds.
- * @returns {string} Time in years, days, hours, mins and secs where each value is > 0.
+ * @returns {string} Time in format 00A 00M 00d 00h 00m where each value is > 0.
  */
 function converttime(value) {
 
     const sec = Math.floor(value % 60);
     const min = Math.floor((value % 3600) / 60);
     const hrs = Math.floor((value % 86400) / 3600);
-    const dys = Math.floor((value % (86400 * 30)) / 86400);
+    const dys = Math.floor((value % 2592000) / 86400);
+	const mts = Math.floor((value % 31104000) / 2592000 );
     const yrs = Math.floor((value / 31536000));
 
-    const yShow = yrs > 0 ? yrs + (yrs == 1 ? "a " : "a ") : "";
+    const yShow = yrs > 0 ? yrs + (yrs == 1 ? "A " : "A ") : "";
+	const MShow = mts > 0 ? mts + (mts == 1 ? "M " : "M ") : "";
     const dShow = dys > 0 ? dys + (dys == 1 ? "d " : "d ") : "";
     const hShow = hrs > 0 ? hrs + (hrs == 1 ? "h " : "h ") : "";
     const mShow = min > 0 ? min + (min == 1 ? "m" : "m") : "";
 
-    return yShow + dShow + hShow + mShow;
+    return yShow + MShow + dShow + hShow + mShow;
 }
 
 /**
@@ -429,7 +449,7 @@ client.on("message", async message => {
             function (callback) {
                 if (SteamIDRegex.test(param)) { //steamid
                     console.log(Date.now() + ": Inicia consulta SQLITE com STEAMID.");
-                    db.get("SELECT steamid, name, ROUND(score,0) as pontos, deaths, ROUND(scoregain,0) as ultsganho, ROUND(deathgain,0) as ultdhs, geo, datapoints, datapointgain, strftime('%d/%m/%Y', seen) as ultvisto FROM stats WHERE steamid = \"" + param.replace("STEAM_", "") + "\" ORDER BY score DESC LIMIT 1", function (err, sqdata) {
+                    db.get("SELECT steamid, name, ROUND(score,0) as pontos, deaths, ROUND(scoregain,0) as ultsganho, ROUND(deathgain,0) as ultdhs, geo, datapoints, datapointgain, strftime('%d/%m/%Y', seen) as ultvisto, lat, lon FROM stats WHERE steamid = \"" + param.replace("STEAM_", "") + "\" ORDER BY score DESC LIMIT 1", function (err, sqdata) {
                         tmp = sqdata;
                         if (!sqdata) return callback("nodata", null);
                         callback(err, sqdata);
@@ -438,7 +458,7 @@ client.on("message", async message => {
                 }
                 else { // nome
                     console.log(Date.now() + ": Inicia consulta SQLITE com NOME.");
-                    db.get("SELECT steamid, name, ROUND(score,0) as pontos, deaths, ROUND(scoregain,0) as ultsganho, ROUND(deathgain,0) as ultdhs, geo, datapoints, datapointgain, strftime('%d/%m/%Y', seen) as ultvisto FROM stats WHERE name LIKE \"%" + param + "%\" ORDER BY score DESC LIMIT 1", function (err, sqdata) {
+                    db.get("SELECT steamid, name, ROUND(score,0) as pontos, deaths, ROUND(scoregain,0) as ultsganho, ROUND(deathgain,0) as ultdhs, geo, datapoints, datapointgain, strftime('%d/%m/%Y', seen) as ultvisto, lat, lon FROM stats WHERE name LIKE \"%" + param + "%\" ORDER BY score DESC LIMIT 1", function (err, sqdata) {
                         tmp = sqdata;
                         if (!sqdata) return callback("nodata", null);
                         callback(err, sqdata);
@@ -514,6 +534,7 @@ client.on("message", async message => {
                         embed.addField("Banido de Trade", "Sim", true)
 
                     }
+					//embed.setImage("https://maps.googleapis.com/maps/api/staticmap?size=360x80&scale=2&language=en&region=ps&center=" + data[0].lat + "," + data[0].lon +"&zoom=7") // imagem que fica apos a descrição
                     //msg.edit({ embed }); // envia msg
                     message.channel.send({ embed });
                 }
