@@ -147,7 +147,10 @@ const MapNames = [
     ['infested', 'Infested'],
     ['incoming', 'Incoming'],
     ['kh1', 'Keen Halloween'],
-    ['hplanet', 'Hostile Planet']
+    ['hplanet', 'Hostile Planet'],
+    ['uboa_rampage_II', 'Uboa Rampage II'],
+    ['sc_egypt', 'Egypt'],
+    ['sc_egypt2', 'Egypt 2']
 ];
 
 /**
@@ -216,8 +219,8 @@ function converttime(value) {
 
     const yShow = yrs > 0 ? yrs + (yrs == 1 ? "A " : "A ") : "";
 	const MShow = mts > 0 ? mts + (mts == 1 ? "M " : "M ") : "";
-    const dShow = dys > 0 ? dys + (dys == 1 ? "d " : "d ") : "";
-    const hShow = hrs > 0 ? hrs + (hrs == 1 ? "h " : "h ") : "";
+    const dShow = dys > 0 ? dys + (dys == 1 ? "D " : "D ") : "";
+    const hShow = hrs > 0 ? hrs + (hrs == 1 ? "H " : "H ") : "";
     const mShow = min > 0 ? min + (min == 1 ? "m" : "m") : "";
 
     return yShow + MShow + dShow + hShow + mShow;
@@ -276,6 +279,8 @@ function FileWatch() {
 
     var guild = client.guilds.get('');
 
+	var previousmap; // to save previous map
+
     tail.on("line", function (data) {
         //console.log(data);
         if (!data) return;
@@ -286,7 +291,7 @@ function FileWatch() {
 
             if (data[2] === '0') return;
 
-            if (MapMsg(data[1]) != null) { //XX iniciou com x jogadores!
+            if (MapMsg(data[1]) != null && data[1] != previousmap ) { //XX iniciou com x jogadores!
                 guild.channels.get(config.statuschannel).send('**' + MapMsg(data[1]) + '** ' + 'iniciou com **' + data[2] + '**' + (data[2] > 1 ? ' jogadores!' : ' jogador!'));
             }
 
@@ -296,6 +301,8 @@ function FileWatch() {
                 .addField("Jogadores", data[2], true)
                 .setTimestamp() // assina com a data atual no rodapé
             guild.channels.get(config.chatchannel).send({ embed });
+
+			previousmap = data[1];
 
             return;
         }
@@ -504,7 +511,7 @@ client.on("message", async message => {
                 else {
                     console.log(Date.now() + ": Exibe resultado.")
                     const embed = new Discord.RichEmbed();
-                    embed.setColor(0x00AE86) // cor da faixa na esquerda
+                    embed.setColor(0xfa4a4a) // cor da faixa na esquerda
                     embed.setTimestamp(fs.statSync(config.sqlitedb).mtime) // assina com a data atual no rodapé
                     embed.setThumbnail(data[1].avatar.large) // thumb lado direito superior
                     embed.addField("Nome", "[" + data[0].name + "](" + data[1].profileURL + ")", true)
@@ -580,27 +587,35 @@ client.on("message", async message => {
                     return message.channel.send("`Servidor indisponivel`");
                 }
                 else {
-                    var jogadores = "Não há jogadores no servidor.";
-                    if (res[1].length > 0) {
-                        jogadores = "";
-                        for (i = 0; i < res[1].length; i++) {
-                            jogadores = jogadores + res[1][i].name + "\n";
-                        }
-                    }
                     //console.log(mapindex(res[0].map));
                     const index = mapindex(res[0].map);
                     const mapthumb = (index === null) ? "https://steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/225840/1ef26a0b4dbabb81d8d1682ffd674bc3c71a313f_thumb.jpg" : "http://scmapdb.wdfiles.com/local--files/map:" + MapData[index].scmdbname + "/" + MapData[index].mappic;
-                    const embed = new Discord.RichEmbed()
-                        .setColor(0x00AE86) // cor da faixa na esquerda
-                        .setTimestamp() // assina com a data atual no rodapé
-                        .setThumbnail(mapthumb) // thumb lado direito superior
-                        .addField("Mapa", res[0].map, true) // + "\n(próximo: " + res[2][17].value + ")"
-                        .addField("Jogadores", res[0].players + "/" + res[0].maxplayers, true)
-                        .addField("Próximo", res[2][17].value, true)
-                        .addField("IP", config.gameserverip + ":" + config.gameserverport, true)
-                        .addField("Jogadores no servidor", jogadores)
-                        .setFooter("Última atualização")
-                    //msg.edit({ embed }); // envia msg
+                    const embed = new Discord.RichEmbed();
+                    embed.setColor(0x0160ac); // line colour on the left
+                    embed.setTimestamp(); // footer with current date
+                    embed.setThumbnail(mapthumb); // thumb on upper right
+                    embed.addField("Mapa atual", res[0].map, true);
+                    embed.addField("Próximo mapa", res[2][17].value, true);
+                    embed.addField("Jogadores", res[0].players + "/" + res[0].maxplayers, true);
+                    embed.addField("IP", `${config.gameserverip}:${config.gameserverport}`, true);
+                    embed.addField("Clique para conectar:", `steam://connect/${config.gameserverip}:${config.gameserverport}`);
+                    if (res[1].length > 0) {
+                        let jogadores = "";
+                        for (let i = 0; i < res[1].length; i++) {
+                            jogadores = jogadores + res[1][i].name + "\n";
+                        }
+                        embed.addField("Jogadores", jogadores, true);
+
+                        let pontos = "";
+                        for (let i = 0; i < res[1].length; i++) {
+                            pontos = pontos + res[1][i].score + "\n";
+                        }
+                        embed.addField("Pontos", pontos, true);
+                    }
+                    else {
+                        embed.addField("", `Não há jogadores no servidor no momento.`);
+                    }
+                    embed.setFooter("Consultado em");
                     message.channel.send({ embed });
                 }
             });
