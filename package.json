@@ -1,0 +1,34 @@
+{
+  "name": "GutsV2",
+  "version": "2.0.0-Beta1",
+  "description": "Discord bot that can do things for HLDM-BR.NET",
+  "main": "app/index.js",
+  "scripts": {
+    "start": "node app/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/HLDM-BR.NET/svencoop-discordbot-js.git"
+  },
+  "author": "R4to0",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://gitlab.com/HLDM-BR.NET/svencoop-discordbot-js/issues"
+  },
+  "homepage": "https://hldm-br.net",
+  "dependencies": {
+    "@discordjs/uws": "^11.149.1",
+    "bufferutil": "^4.0.1",
+    "decache": "^4.5.1",
+    "discord.js": "^11.4.2",
+    "erlpack": "github:discordapp/erlpack",
+    "expose-gc": "^1.0.0",
+    "libsodium-wrappers": "^0.7.4",
+    "multi-lang": "^0.1.2",
+    "node-opus": "^0.3.1",
+    "opusscript": "0.0.6",
+    "sodium": "^3.0.2",
+    "zlib-sync": "^0.1.4"
+  },
+  "devDependencies": {}
+}

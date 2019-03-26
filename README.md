@@ -1,21 +1,21 @@
-## WORK IN PROGRESS!!!
+## Guts - A Discord bot made for HLDM-BR.NET community.
 
-Yet another discord bot made in NodeJS, written for use with HLDM-BR.NET
-Sven Co-op servers.
+![Guts](https://cdn.discordapp.com/attachments/185917047329390592/429483481186304000/latest.png)
 
-Keep in mind that I (R4to0) learned nodejs while writing this, so the script
-might be awful to read :)
+Yet another discord bot made in NodeJS, written for use with HLDM-BR.NET servers.
 
-Warning: Some comments are written in portuguese, total mess :) 
 
-Required modules:
+Feel free to use as a reference for any other purpose.
+
+# Required external modules
+Base:
+- [expose-gc](https://www.npmjs.com/package/expose-gc)
 - [discord.js](https://www.npmjs.com/package/discord.js)
-- [sqlite3](https://www.npmjs.com/package/sqlite3)
-- [steamid](https://www.npmjs.com/package/steamid)
-- [steamapi](https://www.npmjs.com/package/steamapi)
-- [sourcequery](https://www.npmjs.com/package/sourcequery)
-- [async](https://www.npmjs.com/package/async)
-- [fs](https://nodejs.org/docs/latest/api/fs.html)
-- [tail](https://www.npmjs.com/package/tail)
+- [multi-lang](https://www.npmjs.com/package/multi-lang)
 
-This script is currently being rewritten with ESM in mind, no ETA.
+Included modules:
+[soon]
+
+
+Basic documentation will come Soon(tm)
+
