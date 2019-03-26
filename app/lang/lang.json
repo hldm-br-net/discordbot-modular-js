@@ -1,0 +1,50 @@
+{
+    "ML_COMMAND_COOLDOWN": {
+        "en": "please wait %{time} more second(s) before reusing the `%{command}` command.",
+        "bp": "aguarde pelo menos %{time} segundo(s) antes de usar o comando `%{command}` novamente."
+    },
+    "ML_COMMAND_USAGE": {
+        "en": "Usage",
+        "bp": "Uso"
+    },
+    "ML_LOGINMSG": {
+        "en": "Logged in as",
+        "bp": "Autenticado como"
+    },
+    "ML_PM_NOTAVAILABLE": {
+        "en": "This command cannot be used over private messages!",
+        "bp": "Esse comando não pode ser usado via mensagem privada!"
+    },
+    "ML_INTERNAL_ERROR_COMMAND": {
+        "en": "An internal error has occurred while running this command!",
+        "bp": "Ocorreu um erro interno ao executar esse comando!"
+    },
+    "ML_MODULES_INITIALIZE": {
+        "en": "Loading modules...",
+        "bp": "Carregando módulos..."
+    },
+    "ML_MODULES_LOADED": {
+        "en": "%{cnt} module(s) loaded.",
+        "bp": "Carregado(s) %{cnt} módulo(s)."
+    },
+    "ML_MODULES_FAILED": {
+        "en": "%{fcnt} module(s) were not loaded due to an error. Please set verbose to 3 for details.",
+        "bp": "%{fcnt} módulo(s) não carregado(s) devido a um erro. Favor definir o nivel de verbose para 3 para mais detalhes."
+    },
+    "ML_MODULES_FAILED_VERB": {
+        "en": "%{fcnt} module(s) were not loaded due to an error. Check details above.",
+        "bp": "%{fcnt} módulo(s) não carregado(s) devido a um erro. Veja os detalhes acima."
+    },
+    "ML_MODULES_ALREADYREGISTERED": {
+        "en": "%{file} is already loaded, skipping...",
+        "bp": "%{file} já está registrado, ignorando..."
+    },
+    "ML_MODULE_FILELOADED": {
+        "en": "%{file} loaded.",
+        "bp": "%{file} carregado."
+    },
+    "ML_MODULE_FILEFAIL": {
+        "en": "Failed to load %{file}!",
+        "bp": "Erro ao carregar %{file}!"
+    }
+}

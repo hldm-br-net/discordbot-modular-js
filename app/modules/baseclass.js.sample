@@ -1,0 +1,58 @@
+/**
+ * Guts - A Discord bot made for HLDM-BR.NET.
+ * 
+ * MODULENAME module for Guts
+ * 
+ * MIT License
+ * 
+ * Copyright (c) 2019 FirstName "Nickname" LastName
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to
+ * deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ */
+
+"use strict";
+
+// Static module imports
+const multilang = require('multi-lang');
+
+class classname {
+    constructor(bot) {
+        this.m_multilang = multilang(`./app/lang/MODULENAME.json`, bot.m_lang, false);
+
+        this.m_command = 'command';
+        this.m_aliases = ['alias1', 'alias2..'];
+        this.m_description = this.m_multilang('ML_MODULENAME_DESCRIPTION');
+        this.m_args = true;
+        this.m_guildonly = false;
+        this.m_usage = this.m_multilang('ML_MODULENAME_USAGE');
+        this.m_cooldown = 5;
+    }
+    Init() {
+        // Do something when loading module
+    }
+    Unload() {
+        // Do something when unloading/reloading module
+    }
+
+    async execute(msg, args) {
+        // Do something after command match
+    }
+}
+
+module.exports = classname;
