@@ -5,7 +5,7 @@
  * 
  * MIT License
  * 
- * Copyright (c) 2019 FirstName "Nickname" LastName
+ * Copyright (c) 2019 FirstName "NickName" LastName
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -35,13 +35,17 @@ class classname {
     constructor(bot) {
         this.m_multilang = multilang(`./app/lang/MODULENAME.json`, bot.m_lang, false);
 
-        this.m_command = 'command';
-        this.m_aliases = ['alias1', 'alias2..'];
-        this.m_description = this.m_multilang('ML_MODULENAME_DESCRIPTION');
-        this.m_args = true;
-        this.m_guildonly = false;
-        this.m_usage = this.m_multilang('ML_MODULENAME_USAGE');
-        this.m_cooldown = 5;
+        this.m_command = 'command'; // Main command
+        this.m_aliases = ['alias1', 'alias2..']; // Command aliases
+        this.m_description = this.m_multilang('ML_MODULENAME_DESCRIPTION'); // Brief description
+        this.m_args = true; // Requires arguments or not
+        this.m_guildonly = false; // Can only be used at channel or over pm too
+        this.m_hidden = false; // [redacted]
+        this.m_usage = this.m_multilang('ML_MODULENAME_USAGE'); // How to use this command
+        this.m_cooldown = 5; // Delay between usage again
+        this.m_permissions = ['ADMINISTRATOR', 'SEND_TTS_MESSAGES']; // Users with such permissions will be allowed to use (1st check)
+        this.m_allowedroles = ['role1', 'role2..']; // Users with such roles will be allowed to use (2nd check)
+        this.m_denyroles = ['wanker', 'punished']; // Users with such roles will be DENIED to use (3rd check)
     }
     Init() {
         // Do something when loading module

@@ -125,10 +125,16 @@ class GutsBot {
     ListenMsgs() {
         this.m_bot.once('ready', () => {
             utils.printmsg(`${this.m_multilang('ML_LOGINMSG')} ${this.m_bot.user.username}!`);
-            this.m_bot.user.setActivity(`the game`);
+            //this.m_bot.user.setActivity(`you lost the game`);
         });
 
         this.m_bot.on('message', message => {
+            // Can't send message, ignore
+            if (message.channel.type !== "dm" && !message.channel.permissionsFor(this.m_bot.user).has("SEND_MESSAGES")) return;
+
+            // Log if user type in private
+            if (message.channel.type === "dm") utils.printmsg(`Message issued over private by ${message.author.username} (UID: ${message.author.id}): ${message.content}.`, 2);
+
             // If the message has no prefix, or if the message comes from a bot, don't do anything
             if (!message.content.startsWith(this.m_config.prefix) || message.author.bot) return;
 
@@ -146,6 +152,9 @@ class GutsBot {
 
             // Checks if we can use that command over PMs
             if (command.m_guildonly && message.channel.type !== 'text') return message.reply(this.m_multilang('ML_PM_NOTAVAILABLE'));
+
+            // Check for permission
+            if (!this.CheckPermissions(message, command)) return message.reply(this.m_multilang('ML_PERMISSION_DENIED'));
 
             // If there is no args, show how to use such command
             if (command.m_args && !args.length) {
@@ -177,6 +186,7 @@ class GutsBot {
 
             // Try to run that command
             try {
+                utils.printmsg(`Command ${commandName} issued by ${message.author.username} (UID: ${message.author.id}).`);
                 command.execute(message, args);
             }
             catch (error) {
@@ -185,11 +195,31 @@ class GutsBot {
                 utils.printmsg(error, 3);
             }
         });
-
     }
 
     async Destroy() {
         return this.m_bot.destroy();
+    }
+
+    CheckPermissions(msg, command) {
+        // 1st check
+        if (command.m_permissions && command.m_permissions.length > 0)
+            for (let permlist of command.m_permissions)
+                if (msg.member.permissions.has(permlist)) return true;
+
+        // 2nd check
+        if (command.m_allowedroles && command.m_allowedroles.length > 0)
+            if (msg.member.roles.some(r => command.m_allowedroles.includes(r.name))) return true;
+
+        // Freaking wankers (3rd check)
+        if (command.m_denyroles && command.m_denyroles.length > 0)
+            if (msg.member.roles.some(r => command.m_denyroles.includes(r.name))) return false;
+
+        // Not in the allowed list
+        if ((command.m_allowedroles && command.m_allowedroles.length > 0) || (command.m_allowedroles && command.m_allowedroles.length > 0))
+            return false;
+
+        return true; // allow by default if roles/permission list doesn't exist or empty
     }
 
 };
@@ -200,7 +230,7 @@ let BotInstance = new GutsBot();
 process.on("unhandledRejection", err => {
     console.error(`Unhandled promise rejection!\n${err.stack}`);
     try {
-        BotInstance.m_bot.users.get("85509507316219904").send(err.stack); // SEND IT TO ME! R4to0#2874
+        BotInstance.m_bot.users.get(BotInstance.m_config.owneruid).send(err.stack); // Send stack to owner
     }
     catch (error) {
         process.exit();
