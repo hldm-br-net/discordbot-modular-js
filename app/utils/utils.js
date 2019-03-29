@@ -51,7 +51,7 @@ const config = require(`../settings/bot.json`);
 * @param {number} value Time in seconds.
 * @returns {string} Time in format 00A 00M 00d 00h 00m where each value is > 0.
 */
-function FormatTime(seconds) {
+const FormatTime = seconds => {
     const sec = Math.floor(seconds % 60);
     const min = Math.floor((seconds % 3600) / 60);
     const hrs = Math.floor((seconds % 86400) / 3600);
@@ -73,7 +73,7 @@ function FormatTime(seconds) {
  * 
  * @returns {string} Current date in YYYY-MM-DD HH:MM:SS
  */
-function GetLocalDate() {
+const GetLocalDate = () => {
     const date = new Date();
     var ten = function (i) {
         return (i < 10 ? '0' : '') + i;
@@ -92,7 +92,7 @@ function GetLocalDate() {
  * 
  * @returns {number} Time in milliseconds.
  */
-function GetTimeMS() {
+const GetTimeMS = () => {
     return (new Date()).getTime();
 }
 
@@ -101,7 +101,7 @@ function GetTimeMS() {
  * 
  * @returns {number} Unix time.
  */
-function GetUnixTime() {
+const GetUnixTime = () => {
     return Math.round((new Date()).getTime() / 1000);
 }
 
@@ -115,7 +115,7 @@ function GetUnixTime() {
  * @param {string} printmsg Message to print
  * @param {number} level Message level
  */
-function printmsg(msg, level = 1) {
+const printmsg = (msg, level = 1) => {
     // If 0 do nothing (silent)
     if (!config.verbose) return;
 
@@ -137,7 +137,7 @@ function printmsg(msg, level = 1) {
  * 
  * @param {number} sec 
  */
-async function sleep(sec) {
+const sleep = async (sec) => {
     return new Promise(resolve => {
         setTimeout(resolve, sec * 1000);
     });
