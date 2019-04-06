@@ -1,0 +1,22 @@
+{
+    "ML_RELOAD_DESCRIPTION": {
+        "en": "Module Reloader",
+        "bp": "Recarrega módulos"
+    },
+    "ML_RELOAD_USAGE": {
+        "en": "filename",
+        "bp": "arquivo"
+    },
+    "ML_RELOAD_RELOADED": {
+        "en": "`%{filename}` reloaded.",
+        "bp": "`%{filename}` recarregado."
+    },
+    "ML_RELOAD_FAILED": {
+        "en": "Failed to reload `%{filename}`.",
+        "bp": "Falha ao recarregar `%{filename}`."
+    },
+    "ML_RELOAD_NOTSUPPORTED": {
+        "en": "Not supported.",
+        "bp": "Não suportado."
+    }
+}
