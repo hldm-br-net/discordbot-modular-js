@@ -133,12 +133,12 @@ class GutsBot {
             if (message.channel.type !== "dm" && !message.channel.permissionsFor(this.m_bot.user).has("SEND_MESSAGES")) return;
 
             // Log if user type in private
-            if (message.channel.type === "dm") utils.printmsg(`Message issued over private by ${message.author.username} (UID: ${message.author.id}): ${message.content}.`, 2);
+            if (!message.author.bot && message.channel.type === "dm") utils.printmsg(`Message issued over private by ${message.author.username} (UID: ${message.author.id}): ${message.content}.`, 2);
 
             // If the message has no prefix, or if the message comes from a bot, don't do anything
             if (!message.content.startsWith(this.m_config.prefix) || message.author.bot) return;
 
-            //Removes prefix, split commands and arguments
+            // Removes prefix, split commands and arguments
             const args = message.content.slice(this.m_config.prefix.length).split(/ +/g);
 
             // Get command name only
@@ -150,18 +150,28 @@ class GutsBot {
             // Unknown command, do nothing
             if (!command) return;
 
-            // Checks if we can use that command over PMs
-            if (command.m_guildonly && message.channel.type !== 'text') return message.reply(this.m_multilang('ML_PM_NOTAVAILABLE'));
+            let canuse = this.CheckPermissions(message, command);
 
-            // Check for permission
-            if (!this.CheckPermissions(message, command)) return message.reply(this.m_multilang('ML_PERMISSION_DENIED'));
+            // Owner always can use any commands
+            if (canuse !== "owner") {
+                if (command.m_guildonly && message.channel.type === 'dm' && command.m_hidden)
+                    return; // DON'T SAY A THING
+                else if (command.m_guildonly && message.channel.type === 'dm')
+                    return message.reply(this.m_multilang('ML_PM_NOTAVAILABLE'));
+
+                // The hidden stuff
+                if (canuse == false && command.m_hidden)
+                    return; // SILENCE! I KILL YOU!
+                else if (canuse == false)
+                    return message.reply(this.m_multilang('ML_PERMISSION_DENIED')); // no, you can't
+            }
 
             // If there is no args, show how to use such command
-            if (command.m_args && !args.length) {
-                if (command.m_usage) {
+            if (command.m_args && !args.length)
+                if (command.m_usage && command.m_hidden)
+                    return; // No u
+                else if (command.m_usage)
                     return message.channel.send(`${message.author} ${this.m_multilang('ML_COMMAND_USAGE')}: \`${this.m_config.prefix}${command.m_command} ${command.m_usage}\``);
-                }
-            }
 
             // Cooldown feature
             if (!this.m_cooldowns.has(command.m_command)) {
@@ -181,8 +191,10 @@ class GutsBot {
                 }
             }
 
-            timestamps.set(message.author.id, now);
-            setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
+            if (canuse !== "owner") {
+                timestamps.set(message.author.id, now);
+                setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
+            }
 
             // Try to run that command
             try {
@@ -201,27 +213,52 @@ class GutsBot {
         return this.m_bot.destroy();
     }
 
+    // TODO: Is this too messy?
+    // Note: setting owneronly and guildonly to false will allow anyone to use over PM.
     CheckPermissions(msg, command) {
-        // 1st check
-        if (command.m_permissions && command.m_permissions.length > 0)
-            for (let permlist of command.m_permissions)
-                if (msg.member.permissions.has(permlist)) return true;
+        // Owner
+        if (this.IsOwner(msg)) return "owner";
+        //if (this.m_config.owneruid && this.m_config.owneruid === msg.author.id)
+        //return "owner";
 
-        // 2nd check
-        if (command.m_allowedroles && command.m_allowedroles.length > 0)
-            if (msg.member.roles.some(r => command.m_allowedroles.includes(r.name))) return true;
+        // Channel permissions
+        if (msg.channel.type !== "dm") {
+            // Owner only, uid set, uid don't match, DENIED!
+            if (command.m_owneronly === true && !this.IsOwner(msg)) return false;
 
-        // Freaking wankers (3rd check)
-        if (command.m_denyroles && command.m_denyroles.length > 0)
-            if (msg.member.roles.some(r => command.m_denyroles.includes(r.name))) return false;
+            // Enum check
+            if (command.m_permissions && command.m_permissions.length > 0)
+                for (let permlist of command.m_permissions)
+                    if (msg.member.permissions.has(permlist)) return true;
 
-        // Not in the allowed list
-        if ((command.m_allowedroles && command.m_allowedroles.length > 0) || (command.m_allowedroles && command.m_allowedroles.length > 0))
+            // Role check
+            if (command.m_allowedroles && command.m_allowedroles.length > 0)
+                if (msg.member.roles.some(r => command.m_allowedroles.includes(r.name))) return true;
+
+            // Wankers
+            if (command.m_denyroles && command.m_denyroles.length > 0)
+                if (msg.member.roles.some(r => command.m_denyroles.includes(r.name))) return false;
+
+            // Not in the allowed list
+            if ((command.m_allowedroles && command.m_allowedroles.length > 0) || (command.m_allowedroles && command.m_allowedroles.length > 0))
+                return false;
+        }
+
+        // Messaged over PM, guildonly is set and isn't the owner, nope.js
+        if (msg.channel.type === "dm" && command.m_guildonly === true)
             return false;
 
-        return true; // allow by default if roles/permission list doesn't exist or empty
+        return true; // allow by default if roles/permission list doesn't exist or empty or whatever
     }
 
+    IsOwner(msg) {
+        // I AM THE BOSS
+        if (this.m_config.owneruid && this.m_config.owneruid === msg.author.id)
+            return true;
+
+        // gtfo
+        return false;
+    }
 };
 
 let BotInstance = new GutsBot();
