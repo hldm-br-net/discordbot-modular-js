@@ -1,0 +1,22 @@
+{
+    "ML_LOAD_DESCRIPTION": {
+        "en": "Module Loader",
+        "bp": "Inicializador de módulos"
+    },
+    "ML_LOAD_USAGE": {
+        "en": "filename (without extension)",
+        "bp": "arquivo (sem extensão)"
+    },
+    "ML_LOAD_ALREADYLOADED": {
+        "en": "`%{filename}` already loaded.",
+        "bp": "`%{filename}` já está inicializado."
+    },
+    "ML_LOAD_LOADED": {
+        "en": "`%{filename}` loaded.",
+        "bp": "`%{filename}` inicializado."
+    },
+    "ML_LOAD_FAILED": {
+        "en": "Failed to load `%{filename}`.",
+        "bp": "Falha ao carregar `%{filename}`."
+    }
+}
