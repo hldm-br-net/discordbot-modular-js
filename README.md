@@ -14,7 +14,7 @@ Base:
 - [multi-lang](https://www.npmjs.com/package/multi-lang)
 
 Modules:
-- [decache](https://www.npmjs.com/package/decache) (load.js)
+- [decache](https://www.npmjs.com/package/decache) (load.js, unload.js)
 
 
 Basic documentation will come Soon(tm)

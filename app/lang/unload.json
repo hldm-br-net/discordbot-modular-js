@@ -1,0 +1,22 @@
+{
+    "ML_UNLOAD_DESCRIPTION": {
+        "en": "Module Unloader",
+        "bp": "Desabilita módulos"
+    },
+    "ML_UNLOAD_USAGE": {
+        "en": "filename",
+        "bp": "arquivo"
+    },
+    "ML_UNLOAD_NOTSUPPORTED": {
+        "en": "Not supported.",
+        "bp": "Não suportado."
+    },
+    "ML_UNLOAD_UNLOADED": {
+        "en": "Unloaded `%{filename}`.",
+        "bp": "Desabilitado `%{filename}`."
+    },
+    "ML_UNLOAD_NOTLOADED": {
+        "en": "`%{filename}` is not loaded.",
+        "bp": "`%{filename}` não está habilitado."
+    }
+}
