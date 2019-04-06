@@ -7,7 +7,7 @@ Yet another discord bot made in NodeJS, written for use with HLDM-BR.NET servers
 
 Feel free to use as a reference for any other purpose.
 
-## Required external modules
+## Required external dependencies
 Base:
 - [expose-gc](https://www.npmjs.com/package/expose-gc)
 - [discord.js](https://www.npmjs.com/package/discord.js)
@@ -17,5 +17,10 @@ Modules:
 - [decache](https://www.npmjs.com/package/decache) (load.js, reload.js, unload.js)
 
 
-Basic documentation will come Soon(tm)
+## Included commands/modules
+ - load.js/unload.js/reload.js: Loading/Unloading/Reloading of modules on the fly with "!load filename", "!unload filename" and "!reload filename" commands.
 
+#
+`
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+`
