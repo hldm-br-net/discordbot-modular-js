@@ -29,7 +29,6 @@
 
 // Static module imports ESM (disabled due to some limitations with cache system)
 //import Discord from 'discord.js';
-//import ('expose-gc');
 //import fs from 'fs';
 //import multilang from 'multi-lang';
 //import path from 'path';
@@ -37,7 +36,6 @@
 
 // Static module imports
 const fs = require('fs');
-const gc = require('expose-gc/function');
 const Discord = require('discord.js');
 const multilang = require('multi-lang');
 const path = require('path');
@@ -299,7 +297,7 @@ process.on("RESTART", function () {
     console.log("Killing main class instance...");
     try {
         (async () => {
-            BotInstance.Destroy().then(BotInstance = null).then(gc());
+            BotInstance.Destroy().then(BotInstance = null);
             console.log("Spawning new class instance...");
             BotInstance = new GutsBot();
             BotInstance.Run(); // henlo
