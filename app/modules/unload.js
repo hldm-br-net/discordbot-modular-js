@@ -28,8 +28,6 @@
 
 "use strict";
 
-const decache = require('decache');
-const gc = require('expose-gc/function');
 const multilang = require('multi-lang');
 
 class ModuleUnloader {
@@ -71,8 +69,8 @@ class ModuleUnloader {
         victim.Unload(); // TODO: check if function exists
         msg.client.collection.set(args, null);
         msg.client.collection.delete(args);
-        decache(`${this.m_moduledir}/${args}.js`); // delete from node require cache
-        gc(); // force garbage collector to run
+        victim = null;
+        delete require.cache[require.resolve(`${this.m_moduledir}/${args}.js`)]; // delete from node require cache
     }
 
 }

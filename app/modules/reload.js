@@ -28,8 +28,6 @@
 
 "use strict";
 
-const decache = require('decache');
-const gc = require('expose-gc/function');
 const multilang = require('multi-lang');
 
 // Utils
@@ -76,7 +74,7 @@ class ModuleReload {
 
     async LoadModule(msg, args) {
         // Make sure module is not cached
-        decache(`${this.m_moduledir}/${args}.js`);
+        delete require.cache[require.resolve(`${this.m_moduledir}/${args}.js`)];
 
         let loadfile = require(`${this.m_moduledir}/${args}.js`);
         let object = new loadfile(this.bot);
@@ -94,8 +92,8 @@ class ModuleReload {
         victim.Unload(); // TODO: check if function exists first
         msg.client.collection.set(args, null);
         msg.client.collection.delete(args);
-        decache(`${this.m_moduledir}/${args}.js`); // delete from node require cache
-        gc(); // force garbage collector to run
+        victim = null;
+        delete require.cache[require.resolve(`${this.m_moduledir}/${args}.js`)]; // delete from node require cache
     }
 }
 module.exports = ModuleReload;

@@ -9,12 +9,11 @@ Feel free to use as a reference for any other purpose.
 
 ## Required external dependencies
 Base:
-- [expose-gc](https://www.npmjs.com/package/expose-gc)
 - [discord.js](https://www.npmjs.com/package/discord.js)
 - [multi-lang](https://www.npmjs.com/package/multi-lang)
 
 Modules:
-- [decache](https://www.npmjs.com/package/decache) (load.js, reload.js, unload.js)
+- No external dependencies required (load.js, reload.js, unload.js)
 
 
 ## Included commands/modules
