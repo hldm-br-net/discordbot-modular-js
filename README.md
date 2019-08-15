@@ -2,7 +2,7 @@
 
 ![Guts](https://cdn.discordapp.com/attachments/185917047329390592/429483481186304000/latest.png)
 
-Yet another discord bot made in NodeJS, written for use with HLDM-BR.NET servers.
+Yet another modular discord bot made in NodeJS, written for use with HLDM-BR.NET servers.
 
 
 Feel free to use as a reference for any other purpose.
@@ -10,6 +10,7 @@ Feel free to use as a reference for any other purpose.
 ## Required external dependencies
 Base:
 - [discord.js](https://www.npmjs.com/package/discord.js)
+- [emoji-to-short-name](https://www.npmjs.com/package/emoji-to-short-name)
 - [multi-lang](https://www.npmjs.com/package/multi-lang)
 
 Modules:
