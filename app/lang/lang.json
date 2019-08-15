@@ -48,7 +48,19 @@
         "bp": "Erro ao carregar %{file}!"
     },
     "ML_PERMISSION_DENIED": {
-        "en": "You do not have permission to issue this command!",
-        "bp": "Você não tem permissão para utilizar esse comando!"
+        "en": "you do not have permission to issue this command!",
+        "bp": "você não tem permissão para utilizar esse comando!"
+    },
+    "ML_MODULE_UNLOADED": {
+        "en": "Unloaded %{victim}",
+        "bp": "Desativado %{victim}"
+    },
+    "ML_MODULE_UNLOADFAIL": {
+        "en": "Failed to unload %{file}!",
+        "bp": "Erro ao desativar %{file}!"
+    },
+    "ML_CHANNEL_DENIED": {
+        "en": "this channel is restricted for using commands from this bot!",
+        "bp": "esse canal está restrito a uso de comandos deste bot!"
     }
 }

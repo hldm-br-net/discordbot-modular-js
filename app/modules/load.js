@@ -28,7 +28,6 @@
 
 "use strict";
 
-const decache = require('decache');
 const multilang = require('multi-lang');
 
 // Utils
@@ -36,22 +35,22 @@ const utils = require('../utils/utils.js');
 
 class ModuleLoader {
     constructor(bot) {
-        this.m_multilang = multilang(`./app/lang/load.json`, bot.m_lang, false);
+        this.multilang = multilang(`./app/lang/load.json`, bot.lang, false);
         this.bot = bot
-        this.m_moduledir = bot.m_moduledir;
+        this.moduledir = bot.moduledir;
 
-        this.m_command = 'load';
-        //this.m_aliases = ['', ''];
-        this.m_description = this.m_multilang('ML_LOAD_DESCRIPTION');
-        this.m_args = true;
-        this.m_guildonly = true;
-        this.m_hidden = true;
-        this.m_usage = this.m_multilang('ML_LOAD_USAGE');
-        //this.m_cooldown = 0;
-        this.m_owneronly = true;
-        this.m_permissions = ['ADMINISTRATOR'];
-        //this.m_allowedroles = [];
-        //this.m_denyroles = [];
+        this.command = 'load';
+        //this.aliases = ['', ''];
+        this.description = this.multilang('ML_LOAD_DESCRIPTION');
+        this.args = true;
+        this.guildonly = true;
+        this.hidden = true;
+        this.usage = this.multilang('ML_LOAD_USAGE');
+        //this.cooldown = 0;
+        this.owneronly = true;
+        this.permissions = ['ADMINISTRATOR'];
+        //this.allowedroles = [];
+        //this.denyroles = [];
     }
     Init() { }
     Unload() { }
@@ -60,22 +59,23 @@ class ModuleLoader {
         args = args.join(" ");
 
         if (msg.client.collection.has(args))
-            return msg.channel.send(`${this.m_multilang('ML_LOAD_ALREADYLOADED', { filename: args })}`);
+            return msg.channel.send(`${this.multilang('ML_LOAD_ALREADYLOADED', { filename: args })}`);
 
         try {
             await this.LoadModule(msg, args);
-            return msg.channel.send(`${this.m_multilang('ML_LOAD_LOADED', { filename: args })}`);
+            return msg.channel.send(`${this.multilang('ML_LOAD_LOADED', { filename: args })}`);
         } catch (error) {
             utils.printmsg(error, 3);
-            return msg.channel.send(`${this.m_multilang('ML_LOAD_FAILED', { filename: args })}`);
+            return msg.channel.send(`${this.multilang('ML_LOAD_FAILED', { filename: args })}`);
         }
     }
 
     async LoadModule(msg, args) {
         // Make sure module is not cached
-        decache(`${this.m_moduledir}/${args}.js`);
+        delete require.cache[require.resolve(`${this.moduledir}/${args}.js`)];
+        //gc(); // force garbage collector to run
 
-        let loadfile = require(`${this.m_moduledir}/${args}.js`);
+        let loadfile = require(`${this.moduledir}/${args}.js`);
         let object = new loadfile(this.bot);
 
         object.Init(); // call setup

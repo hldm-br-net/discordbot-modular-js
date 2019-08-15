@@ -27,245 +27,23 @@
 
 "use strict";
 
-// Static module imports ESM (disabled due to some limitations with cache system)
-//import Discord from 'discord.js';
-//import fs from 'fs';
-//import multilang from 'multi-lang';
-//import path from 'path';
-//import readline from 'readline';
-
 // Static module imports
-const fs = require('fs');
-const Discord = require('discord.js');
-const multilang = require('multi-lang');
 const path = require('path');
 const readline = require('readline');
 
-// Utils
-const utils = require('./utils/utils.js');
+// Globals
+global.g_basedir = path.resolve(__dirname);
+global.g_issafe = false;
 
-const g_basedir = path.resolve(__dirname);
-
-// Yeah feel free to blame me on about writing this way...
-class GutsBot {
-    constructor() {
-        this.m_moduledir = `${g_basedir}/modules`;
-
-        this.m_config = require(`./settings/bot.json`);
-
-        this.m_lang = this.m_config.lang;
-
-        this.m_bot = new Discord.Client({ autoReconnect: true });
-        this.m_bot.collection = new Discord.Collection();
-        this.m_cooldowns = new Discord.Collection();
-        this.m_multilang = multilang(`./app/lang/lang.json`, this.m_lang, false); // hardcoded path
-    }
-
-    async Run() {
-        // Listen for errors
-        this.m_bot.on("error", console.error);
-        this.m_bot.on("warn", console.warn);
-
-        await this.Loader();
-
-        this.m_bot.login(this.m_config.token);
-
-        this.ListenMsgs();
-    }
-
-    // Load modules
-    async Loader() {
-        let count = 0;
-        let failed = 0;
-        let files = fs.readdirSync(this.m_moduledir).filter(file => file.endsWith('.js'));
-
-        // Iterate though all files
-        for await (let file of files) {
-            let name = path.parse(file).name;
-
-            // File already registered, skip it!
-            if (this.m_bot.collection.has(name)) {
-                utils.printmsg(`${this.m_multilang('ML_MODULES_ALREADYREGISTERED', { file: file })}`);
-                //failed++
-                continue;
-            }
-
-            try {
-                // Load module, instance a class and call it.
-                let loadfile = require(`${this.m_moduledir}/${file}`);
-                let object = new loadfile(this); // expose this class
-                object.Init(); // call setup
-
-                // Register module in the map collector
-                this.m_bot.collection.set(name, object);
-
-                utils.printmsg(`${this.m_multilang('ML_MODULE_FILELOADED', { file: file })}`, 2);
-
-                // Destroy references, just in case
-                loadfile = null;
-                object = null;
-
-                count++;
-            }
-            catch (error) {
-                utils.printmsg(`${this.m_multilang('ML_MODULE_FILEFAIL', { file: file })}`, 2);
-                utils.printmsg(error, 3);
-                failed++;
-            }
-        }
-
-        if (count) utils.printmsg(this.m_multilang('ML_MODULES_LOADED', { cnt: count }));
-        if (failed) utils.printmsg(this.m_multilang(this.m_config.verbose >= 3 ? 'ML_MODULES_FAILED_VERB' : 'ML_MODULES_FAILED', { fcnt: failed }));
-        return;
-    }
-
-    // Listen for messages
-    ListenMsgs() {
-        this.m_bot.once('ready', () => {
-            utils.printmsg(`${this.m_multilang('ML_LOGINMSG')} ${this.m_bot.user.username}!`);
-            //this.m_bot.user.setActivity(`you lost the game`);
-        });
-
-        this.m_bot.on('message', message => {
-            // Can't send message, ignore
-            if (message.channel.type !== "dm" && !message.channel.permissionsFor(this.m_bot.user).has("SEND_MESSAGES")) return;
-
-            // Log if user type in private
-            if (!message.author.bot && message.channel.type === "dm") utils.printmsg(`Message issued over private by ${message.author.username} (UID: ${message.author.id}): ${message.content}.`, 2);
-
-            // If the message has no prefix, or if the message comes from a bot, don't do anything
-            if (!message.content.startsWith(this.m_config.prefix) || message.author.bot) return;
-
-            // Removes prefix, split commands and arguments
-            const args = message.content.slice(this.m_config.prefix.length).split(/ +/g);
-
-            // Get command name only
-            const commandName = args.shift().toLowerCase();
-
-            // Commands/alias handler.
-            const command = this.m_bot.collection.get(commandName) || this.m_bot.collection.find(cmd => cmd.m_aliases && cmd.m_aliases.includes(commandName));
-
-            // Unknown command, do nothing
-            if (!command) return;
-
-            let canuse = this.CheckPermissions(message, command);
-
-            // Owner always can use any commands
-            if (canuse !== "owner") {
-                if (command.m_guildonly && message.channel.type === 'dm' && command.m_hidden)
-                    return; // DON'T SAY A THING
-                else if (command.m_guildonly && message.channel.type === 'dm')
-                    return message.reply(this.m_multilang('ML_PM_NOTAVAILABLE'));
-
-                // The hidden stuff
-                if (canuse == false && command.m_hidden)
-                    return; // SILENCE! I KILL YOU!
-                else if (canuse == false)
-                    return message.reply(this.m_multilang('ML_PERMISSION_DENIED')); // no, you can't
-            }
-
-            // If there is no args, show how to use such command
-            if (command.m_args && !args.length)
-                if (command.m_usage && command.m_hidden)
-                    return; // No u
-                else if (command.m_usage)
-                    return message.channel.send(`${message.author} ${this.m_multilang('ML_COMMAND_USAGE')}: \`${this.m_config.prefix}${command.m_command} ${command.m_usage}\``);
-
-            // Cooldown feature
-            if (!this.m_cooldowns.has(command.m_command)) {
-                this.m_cooldowns.set(command.m_command, new Discord.Collection());
-            }
-
-            const now = Date.now();
-            const timestamps = this.m_cooldowns.get(command.m_command);
-            const cooldownAmount = (command.m_cooldown || 3) * 1000;
-
-            if (timestamps.has(message.author.id)) {
-                const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
-
-                if (now < expirationTime) {
-                    const timeLeft = (expirationTime - now) / 1000;
-                    return message.reply(`${this.m_multilang('ML_COMMAND_COOLDOWN', { time: timeLeft.toFixed(1), command: command.m_command })}`);
-                }
-            }
-
-            if (canuse !== "owner") {
-                timestamps.set(message.author.id, now);
-                setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
-            }
-
-            // Try to run that command
-            try {
-                utils.printmsg(`Command ${commandName} issued by ${message.author.username} (UID: ${message.author.id}).`);
-                command.execute(message, args);
-            }
-            catch (error) {
-                message.reply(this.m_multilang('ML_INTERNAL_ERROR_COMMAND'));
-                utils.printmsg(`Failed to execute command ${message}`, 2);
-                utils.printmsg(error, 3);
-            }
-        });
-    }
-
-    async Destroy() {
-        return this.m_bot.destroy();
-    }
-
-    // TODO: Is this too messy?
-    // Note: setting owneronly and guildonly to false will allow anyone to use over PM.
-    CheckPermissions(msg, command) {
-        // Owner
-        if (this.IsOwner(msg)) return "owner";
-        //if (this.m_config.owneruid && this.m_config.owneruid === msg.author.id)
-        //return "owner";
-
-        // Channel permissions
-        if (msg.channel.type !== "dm") {
-            // Owner only, uid set, uid don't match, DENIED!
-            if (command.m_owneronly === true && !this.IsOwner(msg)) return false;
-
-            // Enum check
-            if (command.m_permissions && command.m_permissions.length > 0)
-                for (let permlist of command.m_permissions)
-                    if (msg.member.permissions.has(permlist)) return true;
-
-            // Role check
-            if (command.m_allowedroles && command.m_allowedroles.length > 0)
-                if (msg.member.roles.some(r => command.m_allowedroles.includes(r.name))) return true;
-
-            // Wankers
-            if (command.m_denyroles && command.m_denyroles.length > 0)
-                if (msg.member.roles.some(r => command.m_denyroles.includes(r.name))) return false;
-
-            // Not in the allowed list
-            if ((command.m_allowedroles && command.m_allowedroles.length > 0) || (command.m_allowedroles && command.m_allowedroles.length > 0))
-                return false;
-        }
-
-        // Messaged over PM, guildonly is set and isn't the owner, nope.js
-        if (msg.channel.type === "dm" && command.m_guildonly === true)
-            return false;
-
-        return true; // allow by default if roles/permission list doesn't exist or empty or whatever
-    }
-
-    IsOwner(msg) {
-        // I AM THE BOSS
-        if (this.m_config.owneruid && this.m_config.owneruid === msg.author.id)
-            return true;
-
-        // gtfo
-        return false;
-    }
-};
-
+// Bot instance
+const GutsBot = require('./core.js');
 let BotInstance = new GutsBot();
 
 // Send unhandled promise error messages over PM
 process.on("unhandledRejection", err => {
     console.error(`Unhandled promise rejection!\n${err.stack}`);
     try {
-        BotInstance.m_bot.users.get(BotInstance.m_config.owneruid).send(err.stack); // Send stack to owner
+        if (g_issafe) BotInstance.bot.users.get(BotInstance.config.owneruid).send(err.stack); // Send stack to owner
     }
     catch (error) {
         process.exit();
@@ -294,10 +72,11 @@ process.on("SIGINT", function () {
 
 // Custom event to restart without killing process
 process.on("RESTART", function () {
+    g_issafe = false;
     console.log("Killing main class instance...");
     try {
         (async () => {
-            BotInstance.Destroy().then(BotInstance = null);
+            await BotInstance.Destroy().then(BotInstance = null);
             console.log("Spawning new class instance...");
             BotInstance = new GutsBot();
             BotInstance.Run(); // henlo

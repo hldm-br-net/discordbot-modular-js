@@ -3,5 +3,8 @@
     "prefix": "!",
     "token": "",
     "verbose": "2",
-    "owneruid": ""
+    "owneruid": "",
+    "privilegedusers": [ ],
+    "allowedchannelids": [ ],
+    "denychannelids": [ ]
 }

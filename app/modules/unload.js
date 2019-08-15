@@ -32,45 +32,50 @@ const multilang = require('multi-lang');
 
 class ModuleUnloader {
     constructor(bot) {
-        this.m_multilang = multilang(`./app/lang/unload.json`, bot.m_lang, false);
+        this.moduledir = bot.moduledir;
+        this.multilang = multilang(`./app/lang/unload.json`, bot.lang, false);
 
-        this.m_command = 'unload';
-        //this.m_aliases = ['', ''];
-        this.m_description = this.m_multilang('ML_UNLOAD_DESCRIPTION');
-        this.m_args = true;
-        this.m_guildonly = true;
-        this.m_hidden = true;
-        this.m_usage = this.m_multilang('ML_UNLOAD_USAGE');
-        //this.m_cooldown = 0;
-        this.m_owneronly = true;
-        this.m_permissions = ['ADMINISTRATOR'];
-        //this.m_allowedroles = [];
-        //this.m_denyroles = [];
+        this.command = 'unload';
+        //this.aliases = ['', ''];
+        this.description = this.multilang('ML_UNLOAD_DESCRIPTION');
+        this.args = true;
+        this.guildonly = true;
+        this.hidden = true;
+        this.usage = this.multilang('ML_UNLOAD_USAGE');
+        //this.cooldown = 0;
+        this.owneronly = true;
+        this.permissions = ['ADMINISTRATOR'];
+        //this.allowedroles = [];
+        //this.denyroles = [];
     }
     Init() { }
+    Unload() { }
 
     async execute(msg, args) {
         args = args.join(" ");
 
         if (args === "load" | args === "unload" | args === "reload")
-            return msg.channel.send(this.m_multilang('ML_UNLOAD_NOTSUPPORTED'));
+            return msg.channel.send(this.multilang('ML_UNLOAD_NOTSUPPORTED'));
 
         if (msg.client.collection.has(args)) {
             await this.UnloadModule(msg, args);
-            return msg.channel.send(`${this.m_multilang('ML_UNLOAD_UNLOADED', { filename: args })}`)
+            return msg.channel.send(`${this.multilang('ML_UNLOAD_UNLOADED', { filename: args })}`)
         }
         else {
-            return msg.channel.send(`${this.m_multilang('ML_UNLOAD_NOTLOADED', { filename: args })}`)
+            return msg.channel.send(`${this.multilang('ML_UNLOAD_NOTLOADED', { filename: args })}`)
         }
     }
 
     async UnloadModule(msg, args) {
-        let victim = msg.client.collection.get(args)
-        victim.Unload(); // TODO: check if function exists
+        let victim = msg.client.collection.get(args);
+        victim.Unload(); // TODO: check if function exists first
+        Object.keys(victim).forEach(function(key) { victim[key] = null;/* console.log(victim[key]);*/ }); //Null all member vars
         msg.client.collection.set(args, null);
         msg.client.collection.delete(args);
         victim = null;
-        delete require.cache[require.resolve(`${this.m_moduledir}/${args}.js`)]; // delete from node require cache
+        //decache(`${this.moduledir}/${args}.js`); // delete from node require cache
+        delete require.cache[require.resolve(`${this.moduledir}/${args}.js`)];
+        //gc(); // force garbage collector to run
     }
 
 }

@@ -26,6 +26,9 @@
 
 "use strict";
 
+// Static module imports
+const emojiSn = require('emoji-to-short-name');
+
 const config = require(`../settings/bot.json`);
 
 /**
@@ -59,7 +62,7 @@ const FormatTime = seconds => {
     const mts = Math.floor((seconds % 31104000) / 2592000);
     const yrs = Math.floor((seconds / 31536000));
 
-    const yShow = yrs > 0 ? yrs + (yrs == 1 ? "A " : "A ") : "";
+    const yShow = yrs > 0 ? yrs + (yrs == 1 ? "Y " : "Y ") : "";
     const MShow = mts > 0 ? mts + (mts == 1 ? "M " : "M ") : "";
     const dShow = dys > 0 ? dys + (dys == 1 ? "D " : "D ") : "";
     const hShow = hrs > 0 ? hrs + (hrs == 1 ? "h " : "h ") : "";
@@ -133,6 +136,76 @@ const printmsg = (msg, level = 1) => {
 }
 
 /**
+ * Resolve Discord IDs in the message. Also strips all the unicode crap.
+ * 
+ * OPTIMIZE: Fix regex to be used as global line multi match and remove while loops
+ * FIXME: custom emoji regex eating last char from name
+ * 
+ * What is resolved:
+ * Usernames (not server nicks)
+ * Channel names
+ * Role names
+ * Unicode emojis
+ * Custom emojis
+ * 
+ * What is escaped:
+ * `_*~
+ * 
+ * What is removed:
+ * Any unicode character (disabled for now)
+ * 
+ * @param {Object} bot Discord client instance object
+ * @param {string} guildid Guild ID
+ * @param {string} msgcontent Message content
+ * @param {boolean} markdown Escape Discord markdown codes (optional)
+ * @param {boolean} thing If should include @/# within resolved content (optional)
+ * @returns {string} Message with parsed text
+ */
+const ResolveStuff = (bot, guildid, msgcontent, markdown = true, thing = false) => {
+    // Regex stuff
+    const UserRgx = /<@!?(\d+?)>/; // User/nick
+    const ChnlRgx = /<#(\d+?)>/; // Channel names
+    const RoleRgx = /<@&(\d+?)>/; // Roles
+    const EmojRgx = /<(:.+?:)\d+?>/g; // Custom emojis. {2,32} for name limits
+    const DiMdRgx = /(\`|\_|\*|\~)/g; // Discord markdown codes
+    //const UnChRgx = /[^\x00-\x7F]/g; // Unicode chars
+
+    let resolved = msgcontent;
+    let guild = bot.guilds.get(guildid);
+
+    if (guild) {
+        // User/nick
+        while (UserRgx.exec(resolved)) {
+            resolved = resolved.replace(UserRgx, function (nm) { return (thing ? '@' : '') + guild.member(nm.replace(UserRgx, '$1')).user.username; })
+            //resolved = resolved.replace(UserRgx, `${(thing ? '@' : '')}${guild.member('$1').user.username }`);
+        }
+
+        // Roles
+        while (RoleRgx.exec(resolved)) {
+            resolved = resolved.replace(RoleRgx, function (rl) { return (thing ? '@' : '') + guild.roles.get(rl.replace(RoleRgx, '$1')).name; })
+        }
+    }
+
+    // Channel names
+    while (ChnlRgx.exec(resolved)) {
+        resolved = resolved.replace(ChnlRgx, function (cn) { return (thing ? '#' : '') + bot.channels.get(cn.replace(ChnlRgx, '$1')).name; })
+    }
+
+    resolved = resolved.replace(EmojRgx, '$1'); // Custom emojis
+    if (markdown) resolved = resolved.replace(DiMdRgx, '\\$1'); // Escape discord markdown codes
+
+    // Unicode emojis
+    resolved = emojiSn.encode(resolved);
+
+    // non-ASCII stuff. WARNING: Remove latin chars such as àáã...
+    /*while (UnChRgx.exec(resolved)) {
+        resolved = resolved.replace(UnChRgx, '');
+    }*/
+
+    return resolved;
+}
+
+/**
  * Simulates the sleep command from Unix
  * 
  * @param {number} sec 
@@ -143,12 +216,14 @@ const sleep = async (sec) => {
     });
 };
 
+
 module.exports = {
     FormatTime,
     GetLocalDate,
     GetTimeMS,
     GetUnixTime,
     printmsg,
+    ResolveStuff,
     sleep
 }
 

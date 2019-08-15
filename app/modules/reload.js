@@ -1,7 +1,7 @@
 /**
  * Guts - A Discord bot made for HLDM-BR.NET.
  * 
- * Reloader module for Guts
+ * Reloader module for Guts (so-called "hot module reloading")
  * 
  * MIT License
  * 
@@ -36,47 +36,49 @@ const utils = require('../utils/utils.js');
 class ModuleReload {
     constructor(bot) {
         this.bot = bot
-        this.m_moduledir = bot.m_moduledir;
-        this.m_multilang = multilang(`./app/lang/reload.json`, bot.m_lang, false);
+        this.moduledir = bot.moduledir;
+        this.multilang = multilang(`./app/lang/reload.json`, bot.lang, false);
 
-        this.m_command = 'reload';
-        //this.m_aliases = ['', ''];
-        this.m_description = this.m_multilang('ML_RELOAD_DESCRIPTION');
-        this.m_args = true;
-        this.m_guildonly = true;
-        this.m_hidden = true;
-        this.m_usage = this.m_multilang('ML_RELOAD_USAGE');
-        //this.m_cooldown = 0;
-        this.m_owneronly = true;
-        this.m_permissions = ['ADMINISTRATOR'];
-        //this.m_allowedroles = [];
-        //this.m_denyroles = [];
+        this.command = 'reload';
+        //this.aliases = ['', ''];
+        this.description = this.multilang('ML_RELOAD_DESCRIPTION');
+        this.args = true;
+        this.guildonly = true;
+        this.hidden = true;
+        this.usage = this.multilang('ML_RELOAD_USAGE');
+        //this.cooldown = 0;
+        this.owneronly = true;
+        this.permissions = ['ADMINISTRATOR'];
+        //this.allowedroles = [];
+        //this.denyroles = [];
     }
     Init() { }
+    Unload() { }
 
     async execute(msg, args) {
         args = args.join(" ");
 
         if (args === "load" | args === "unload" | args === "reload")
-            return msg.channel.send(this.m_multilang('ML_RELOAD_NOTSUPPORTED'));
+            return msg.channel.send(this.multilang('ML_RELOAD_NOTSUPPORTED'));
 
         if (msg.client.collection.has(args))
             await this.UnloadModule(msg, args);
 
         try {
             await this.LoadModule(msg, args);
-            return msg.channel.send(`${this.m_multilang('ML_RELOAD_RELOADED', { filename: args })}`);
+            return msg.channel.send(`${this.multilang('ML_RELOAD_RELOADED', { filename: args })}`);
         } catch (error) {
             utils.printmsg(error, 3);
-            return msg.channel.send(`${this.m_multilang('ML_RELOAD_FAILED', { filename: args })}`);
+            return msg.channel.send(`${this.multilang('ML_RELOAD_FAILED', { filename: args })}`);
         }
     }
 
     async LoadModule(msg, args) {
         // Make sure module is not cached
-        delete require.cache[require.resolve(`${this.m_moduledir}/${args}.js`)];
-
-        let loadfile = require(`${this.m_moduledir}/${args}.js`);
+        delete require.cache[require.resolve(`${this.moduledir}/${args}.js`)];
+        //gc(); // force garbage collector to run
+        
+        let loadfile = require(`${this.moduledir}/${args}.js`);
         let object = new loadfile(this.bot);
 
         object.Init(); // call setup
@@ -90,10 +92,13 @@ class ModuleReload {
     async UnloadModule(msg, args) {
         let victim = msg.client.collection.get(args);
         victim.Unload(); // TODO: check if function exists first
+        Object.keys(victim).forEach(function(key) { victim[key] = null;/* console.log(victim[key]);*/ }); //Null all member vars
         msg.client.collection.set(args, null);
         msg.client.collection.delete(args);
         victim = null;
-        delete require.cache[require.resolve(`${this.m_moduledir}/${args}.js`)]; // delete from node require cache
+        //decache(`${this.moduledir}/${args}.js`); // delete from node require cache
+        delete require.cache[require.resolve(`${this.moduledir}/${args}.js`)];
+        //gc(); // force garbage collector to run
     }
 }
 module.exports = ModuleReload;
