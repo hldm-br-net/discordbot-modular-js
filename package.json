@@ -18,7 +18,7 @@
   "homepage": "https://hldm-br.net",
   "dependencies": {
     "@discordjs/uws": "^11.149.1",
-    "discord.js": "github:discordjs/discord.js",
+    "discord.js": "^11.5.1",
     "emoji-to-short-name": "^1.0.1",
     "erlpack": "github:discordapp/erlpack",
     "multi-lang": "^0.1.2",
