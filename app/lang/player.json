@@ -1,0 +1,107 @@
+{
+    "ML_PLAYER_DESCRIPTION": {
+        "en": "Player statistics query.",
+        "bp": "Consulta estatísticas de jogadores."
+    },
+    "ML_PLAYER_USAGE": {
+        "en": "Name/SteamID/@Mention",
+        "bp": "Nome/SteamID/@Menção"
+    },
+    "ML_PLAYER_SQLITEBUSY": {
+        "en": "SQLite is busy! Please try again in a second...",
+        "bp": "SQLite está ocupado. Tente novamente em alguns instantes..."
+    },
+    "ML_PLAYER_NOTFOUND": {
+        "en": "Player not found.",
+        "bp": "Jogador não encontrado."
+    },
+    "ML_PLAYER_SAPIUNAVAILABLE": {
+        "en": "Steam API unavailable. Results will be limited!",
+        "bp": "Steam API indisponível. O resultado será limitado!"
+    },
+    "ML_PLAYER_NAMEFIELD": {
+        "en": "Name",
+        "bp": "Nome"
+    },
+    "ML_PLAYER_RANKFIELD": {
+        "en": "Rank",
+        "bp": "Posição no Ranking"
+    },
+    "ML_PLAYER_COUNTRYFIELD": {
+        "en": "Country",
+        "bp": "País"
+    },
+    "ML_PLAYER_UNKNOWN": {
+        "en": "Unknown",
+        "bp": "Desconhecido"
+    },
+    "ML_PLAYER_SRVTIMEFIELD": {
+        "en": "Server time",
+        "bp": "Tempo no servidor"
+    },
+    "ML_PLAYER_LSTSEENFIELD": {
+        "en": "Last seen",
+        "bp": "Última vez visto"
+    },
+    "ML_PLAYER_SCOREFIELD": {
+        "en": "Score",
+        "bp": "Pontos"
+    },
+    "ML_PLAYER_DEATHFIELD": {
+        "en": "Deaths",
+        "bp": "Mortes"
+    },
+    "ML_PLAYER_SIDFIELD": {
+        "en": "Steam ID",
+        "bp": "Steam ID"
+    },
+    "ML_PLAYER_VACFIELD": {
+        "en": "VAC banned",
+        "bp": "Banido por VAC"
+    },
+    "ML_PLAYER_YES": {
+        "en": "Yes",
+        "bp": "Sim"
+    },
+    "ML_PLAYER_GAMEBAN": {
+        "en": "Game banned",
+        "bp": "Banimento de jogo"
+    },
+    "ML_PLAYER_LASTBAN": {
+        "en": "Last account ban",
+        "bp": "Último banimento na conta"
+    },
+    "ML_PLAYER_COMMBAN": {
+        "en": "Steam Community banned",
+        "bp": "Banido da Comunidade Steam"
+    },
+    "ML_PLAYER_TRADEBAN": {
+        "en": "Trade banned",
+        "bp": "Banido de Trade"
+    },
+    "ML_PLAYER_QUERYTIME": {
+        "en": "Took %{time}ms",
+        "bp": "Consulta levou %{time}ms"
+    },
+    "ML_PLAYER_CACHEMSG": {
+        "en": "from cache. Cached for %{timesec} seconds",
+        "bp": "do cache. Válido por %{timesec} segundos"
+    },
+    "ML_PLAYER_LASTUPDATE": {
+        "en": "Last updated:",
+        "bp": "Última atualização:"
+    }
+    ,
+    "ML_PLAYER_TODAY": {
+        "en": "Today",
+        "bp": "Hoje"
+    },
+    "ML_PLAYER_YESTERDAY": {
+        "en": "Yesterday",
+        "bp": "Ontem"
+    },
+    "ML_PLAYER_DAYSAGO": {
+        "en": "ago",
+        "bp": "atrás"
+    }
+}

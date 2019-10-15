@@ -1,0 +1,8 @@
+{
+    "cachetime": "5",
+    "databasefile": "/path/to/scstats.db",
+    "gmapsapikey": "",
+    "steamapicachetime": "1440",
+    "steamapikey": "",
+    "steamapiqueryretries": "1"
+}
