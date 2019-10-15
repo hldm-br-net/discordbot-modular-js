@@ -1,0 +1,50 @@
+{
+    "ML_TTS_DESCRIPTION": {
+        "en": "voice <speed> <pitch> sentences. Speed and pitch values are optional.",
+        "bp": "voz <velocidade> <pitch> sentenças. Velocidade e pitch são valores opcionais."
+    },
+    "ML_TTS_NOATTACHPERM": {
+        "en": "I don't have permission to send attachment on this channel.",
+        "bp": "Não possuo permissão para enviar anexos neste canal."
+    },
+    "ML_TTS_NOTFOUND": {
+        "en": "The specified voice `%{voice}` is invalid.",
+        "bp": "A voz especificada `%{voice}` é inválida."
+    },
+    "ML_TTS_INVALIDSPEED": {
+        "en": "Invalid speed value. Max: %{max}. Min: %{min}.",
+        "bp": "Velocidade invalida. Max: %{max}. Min: %{min}."
+    },
+    "ML_TTS_TEXTTOOLONG": {
+        "en": "Error: Text too long!",
+        "bp": "Erro: Texto muito longo!"
+    },
+    "ML_TTS_NOTEXT": {
+        "en": "No text specified.",
+        "bp": "Nenhum texto especificado."
+    },
+    "ML_TTS_PROCESSING": {
+        "en": "Processing...",
+        "bp": "Processando..."
+    },
+    "ML_TTS_API_ERROR": {
+        "en": "The API server returned an error, please try again in a moment. ",
+        "bp": "O serviço de API retornou um erro, tente novamente em alguns instantes."
+    },
+    "ML_TTS_INVALIDPITCH": {
+        "en": "Invalid pitch value. Max: %{max}. Min: %{min}.",
+        "bp": "Pitch invalido. Max: %{max}. Min: %{min}."
+    },
+    "ML_TTS_CONVERTING": {
+        "en": "Converting to ogg...",
+        "bp": "Convertendo para ogg..."
+    },
+    "ML_TTS_UPLOADING": {
+        "en": "Uploading...",
+        "bp": "Enviando..."
+    },
+    "ML_TTS_": {
+        "en": "",
+        "bp": ""
+    }
+}

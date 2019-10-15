@@ -1,0 +1,38 @@
+{
+    "permissions": [
+        "ADMINISTRATOR",
+        "SEND_TTS_MESSAGES"
+    ],
+    "allowedroles": [
+        "Admin",
+        "Moderador",
+        "SHSL Donator",
+        "Donator"
+    ],
+    "denyroles": [],
+    "apiurl": "https://path/to/url/SAPI4",
+    "reactyes": "✅",
+    "reactno": "❌",
+    "voices": [
+        {
+            "shortname": "sam",
+            "name": "Sam",
+            "defSpeed": 150,
+            "minSpeed": 30,
+            "defPitch": 100,
+            "minPitch": 50,
+            "maxPitch": 200,
+            "maxSpeed": 450
+        },
+        {
+            "shortname": "bonzibuddy",
+            "name": "Adult Male #2 American English (TruVoice)",
+            "defSpeed": 157,
+            "minSpeed": 50,
+            "defPitch": 140,
+            "minPitch": 50,
+            "maxPitch": 400,
+            "maxSpeed": 250
+        }
+    ]
+}
