@@ -1,5 +1,5 @@
 /**
- * A Discord bot made for HLDM-BR.NET.
+ * Discord bot made for HLDM-BR.NET.
  * 
  * SAPI4 module, for use with TETYYS's SAPI4 web interface https://github.com/TETYYS/SAPI4
  * 
@@ -37,7 +37,7 @@ let streamBuffers = require('stream-buffers');
 // Utils
 const utils = require('../utils/utils.js');
 
-class sapi4 {
+module.exports = class sapi4 {
     constructor(bot) {
         this.bot = bot;
 
@@ -205,5 +205,3 @@ class sapi4 {
         });
     }
 }
-
-module.exports = sapi4;

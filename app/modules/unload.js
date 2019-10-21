@@ -1,7 +1,7 @@
 /**
- * Guts - A Discord bot made for HLDM-BR.NET.
+ * Discord bot made for HLDM-BR.NET.
  * 
- * Unloader module for Guts
+ * Unloader module
  * 
  * MIT License
  * 
@@ -30,7 +30,7 @@
 
 const multilang = require('multi-lang');
 
-class ModuleUnloader {
+module.exports = class ModuleUnloader {
     constructor(bot) {
         this.moduledir = bot.moduledir;
         this.multilang = multilang(`./app/lang/unload.json`, bot.lang, false);
@@ -77,7 +77,4 @@ class ModuleUnloader {
         delete require.cache[require.resolve(`${this.moduledir}/${args}.js`)];
         //gc(); // force garbage collector to run
     }
-
 }
-
-module.exports = ModuleUnloader;

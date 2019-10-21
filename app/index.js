@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Guts - A Discord bot made for HLDM-BR.NET.
+ * Discord bot made for HLDM-BR.NET.
  * 
  * MIT License
  * 
@@ -36,8 +36,8 @@ global.g_basedir = path.resolve(__dirname);
 global.g_issafe = false;
 
 // Bot instance
-const GutsBot = require('./core.js');
-let BotInstance = new GutsBot();
+const Bot = require('./core.js');
+let BotInstance = new Bot();
 
 // Send unhandled promise error messages over PM
 process.on("unhandledRejection", err => {
@@ -78,7 +78,7 @@ process.on("RESTART", function () {
         (async () => {
             await BotInstance.Destroy().then(BotInstance = null);
             console.log("Spawning new class instance...");
-            BotInstance = new GutsBot();
+            BotInstance = new Bot();
             BotInstance.Run(); // henlo
         })();
     }

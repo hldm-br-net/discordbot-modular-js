@@ -1,5 +1,5 @@
 /**
- * Guts - A Discord bot made for HLDM-BR.NET.
+ * Discord bot made for HLDM-BR.NET.
  * 
  * MIT License
  * 
@@ -36,7 +36,7 @@ const path = require('path');
 const utils = require('./utils/utils.js');
 
 // Yeah feel free to blame me on about writing this way...
-module.exports = class GutsBot {
+module.exports = class Bot {
     constructor() {
         this.moduledir = `${g_basedir}/modules`;
 

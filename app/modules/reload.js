@@ -1,7 +1,7 @@
 /**
- * Guts - A Discord bot made for HLDM-BR.NET.
+ * Discord bot made for HLDM-BR.NET.
  * 
- * Reloader module for Guts (so-called "hot module reloading")
+ * Reloader module (so-called "hot module reloading")
  * 
  * MIT License
  * 
@@ -33,7 +33,7 @@ const multilang = require('multi-lang');
 // Utils
 const utils = require('../utils/utils.js');
 
-class ModuleReload {
+module.exports = class ModuleReload {
     constructor(bot) {
         this.bot = bot
         this.moduledir = bot.moduledir;
@@ -101,4 +101,3 @@ class ModuleReload {
         //gc(); // force garbage collector to run
     }
 }
-module.exports = ModuleReload;

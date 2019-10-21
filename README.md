@@ -1,6 +1,4 @@
-# Guts - A Discord bot made for HLDM-BR.NET community.
-
-![Guts](https://cdn.discordapp.com/attachments/185917047329390592/429483481186304000/latest.png)
+# Discord bot made for HLDM-BR.NET community.
 
 Yet another modular discord bot made in NodeJS, written for use with HLDM-BR.NET servers.
 

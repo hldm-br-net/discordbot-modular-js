@@ -1,7 +1,7 @@
 /**
- * Guts - A Discord bot made for HLDM-BR.NET.
+ * Discord bot made for HLDM-BR.NET.
  * 
- * Loader module for Guts
+ * Loader module
  * 
  * MIT License
  * 
@@ -33,7 +33,7 @@ const multilang = require('multi-lang');
 // Utils
 const utils = require('../utils/utils.js');
 
-class ModuleLoader {
+module.exports = class ModuleLoader {
     constructor(bot) {
         this.multilang = multilang(`./app/lang/load.json`, bot.lang, false);
         this.bot = bot
@@ -86,4 +86,3 @@ class ModuleLoader {
         object = null;
     }
 }
-module.exports = ModuleLoader;

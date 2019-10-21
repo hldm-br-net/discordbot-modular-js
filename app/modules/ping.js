@@ -1,5 +1,5 @@
 /**
- * A Discord bot made for HLDM-BR.NET.
+ * Discord bot made for HLDM-BR.NET.
  * 
  * Ping/Pong module
  * 
@@ -28,7 +28,7 @@
 
 "use strict";
 
-class ping {
+module.exports = class ping {
     constructor(bot) {
         this.command = 'ping';
         this.description = 'Ping!';
@@ -47,5 +47,3 @@ class ping {
         });
     }
 }
-
-module.exports = ping;

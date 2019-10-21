@@ -1,5 +1,5 @@
 /**
- * A Discord bot made for HLDM-BR.NET.
+ * Discord bot made for HLDM-BR.NET.
  * 
  * SCStats player query module module
  * 
@@ -42,7 +42,7 @@ const SteamID = require('steamid');
 // Utils
 const utils = require('../utils/utils.js');
 
-class scsplr {
+module.exports = class scsplr {
     constructor(bot) {
         this.bot = bot;
 
@@ -293,9 +293,6 @@ class scsplr {
         }
     }
 }
-
-module.exports = scsplr;
-
 
 /* Old logic for future reference
 const row = await sql.prepare(
