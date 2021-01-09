@@ -1,6 +1,9 @@
 {
-  "name": "HLDM-BR.NET Bot",
-  "version": "2.0.0",
+  "name": "hldmbr bot",
+  "engines": {
+    "node": ">=12"
+  },
+  "version": "2.1.0",
   "description": "Discord bot that can do things for HLDM-BR.NET",
   "main": "app/index.js",
   "scripts": {
@@ -17,22 +20,17 @@
   },
   "homepage": "https://hldm-br.net",
   "dependencies": {
-    "@discordjs/uws": "^11.149.1",
-    "better-sqlite3": "^5.4.2",
-    "discord.js": "^11.5.1",
+    "discord.js": "^12.5.1",
     "emoji-to-short-name": "^1.0.1",
-    "erlpack": "github:discordapp/erlpack",
-    "fluent-ffmpeg": "^2.1.2",
-    "multi-lang": "^0.1.2",
-    "node-opus": "^0.3.2",
-    "request": "^2.88.0",
-    "request-promise-native": "^1.0.7",
-    "sodium": "^3.0.2",
-    "steamapi": "^2.0.7",
-    "steamid": "^1.1.3",
-    "stream-buffers": "^3.0.2",
-    "zlib-sync": "^0.1.5",
-    "zucc": "^0.1.2"
+    "multi-lang": "^0.1.2"
   },
-  "devDependencies": {}
+  "devDependencies": {},
+  "optionalDependencies": {
+    "@discordjs/opus": "^0.3.3",
+    "bufferutil": "^4.0.3",
+    "erlpack": "github:discord/erlpack",
+    "sodium": "^3.0.2",
+    "utf-8-validate": "^5.0.4",
+    "zlib-sync": "^0.1.7"
+  }
 }

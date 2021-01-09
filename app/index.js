@@ -40,16 +40,15 @@ const Bot = require('./core.js');
 let BotInstance = new Bot();
 
 // Send unhandled promise error messages over PM
-process.on("unhandledRejection", err => {
-    console.error(`Unhandled promise rejection!\n${err.stack}`);
+process.on("unhandledRejection", err => { // maybe use uncaughtException?
+    console.error(`Unhandled promise rejection!\n${err}`);
     try {
-        if (g_issafe) BotInstance.bot.users.get(BotInstance.config.owneruid).send(err.stack); // Send stack to owner
+        if (g_issafe) BotInstance.bot.users.cache.get(BotInstance.botconfig.owneruid).send(err.stack); // Send stack to owner
     }
     catch (error) {
         process.exit();
     }
 });
-
 
 // Catch CTRL+C on Windows. Requires 'readline'.
 // https://stackoverflow.com/questions/10021373/what-is-the-windows-equivalent-of-process-onsigint-in-node-js

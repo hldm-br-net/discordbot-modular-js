@@ -44,7 +44,7 @@ module.exports = class Bot {
 
         this.lang = this.botconfig.lang;
 
-        this.bot = new Discord.Client({ autoReconnect: true });
+        this.bot = new Discord.Client({ autoReconnect: true, disableMentions: 'everyone' });
         this.bot.collection = new Discord.Collection();
         this.cooldowns = new Discord.Collection();
         this.multilang = multilang(`./app/lang/lang.json`, this.lang, false); // hardcoded path
@@ -169,7 +169,7 @@ module.exports = class Bot {
                 if (command.usage && command.hidden)
                     return; // Ur not allowed, no u
                 else if (command.usage)
-                    return message.channel.send(`${message.author} ${this.multilang('ML_COMMAND_USAGE')}: \`${this.botconfig.prefix}${command.command} ${command.usage}\``);
+                    return message.channel.send(`${message.author} ${this.multilang('ML_COMMAND_USAGE')}: \`${this.botconfig.prefix}${commandName} ${command.usage}\``);
 
             // Cooldown feature
             if (!this.cooldowns.has(command.command)) {
@@ -197,7 +197,7 @@ module.exports = class Bot {
             // Try to run that command
             try {
                 utils.printmsg(`Command ${commandName} issued by ${message.author.username} (UID: ${message.author.id}).`);
-                command.execute(message, args);
+                command.execute(message, args, commandName);
             }
             catch (error) {
                 message.reply(this.multilang('ML_INTERNAL_ERROR_COMMAND'));
@@ -222,7 +222,7 @@ module.exports = class Bot {
                 process.exit(); // Force quit
             }
         }
-        return await this.bot.destroy();
+        return this.bot.destroy();
     }
 
     // Note: Is this too messy?

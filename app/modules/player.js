@@ -100,6 +100,9 @@ module.exports = class scsplr {
 
         await msg.channel.startTyping();
         //let startms = utils.GetTimeMS();
+        
+        // HACK: Replace thumbsup emoji with :1: because mobile converts :1: to it
+        args = args.replace(/👍/g, ":1:");
 
         args = utils.ResolveStuff(msg.client, (msg.channel.type === 'text' ? msg.guild.id : null), args, false); // Resolve nicks/usernames/emojis/mentions/roles if any
         if (!args) return; // User input is non-ascii chars only, now empty.
@@ -118,7 +121,7 @@ module.exports = class scsplr {
         sapims = utils.GetTimeMS() - sapims;
 
         // Fancy embed stuff
-        let embed = new Discord.RichEmbed();
+        let embed = new Discord.MessageEmbed();
 
         if (!playerdata.steamapi) embed.setAuthor(this.multilang('ML_PLAYER_SAPIUNAVAILABLE'));
 
@@ -148,7 +151,7 @@ module.exports = class scsplr {
                 embed.addField(this.multilang('ML_PLAYER_VACFIELD'), `${this.multilang('ML_PLAYER_YES')} *(${playerdata.steamapi.bans.vacBans})*`, true);
 
             if (playerdata.steamapi.bans.gameBans > 0)
-                embed.addField("", `${this.multilang('ML_PLAYER_YES')} *(${playerdata.steamapi.bans.gameBans})*`, true);
+                embed.addField("Game Banned", `${this.multilang('ML_PLAYER_YES')} *(${playerdata.steamapi.bans.gameBans})*`, true);
 
             if (playerdata.steamapi.bans.communityBanned)
                 embed.addField(this.multilang('ML_PLAYER_COMMBAN'), this.multilang('ML_PLAYER_YES'), true);
@@ -237,7 +240,7 @@ module.exports = class scsplr {
             }
         }
         else {
-            let reg = new RegExp(`${plr}`, 'i'); // case insensitive
+            let reg = new RegExp(`${plr.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&")}`, 'i'); // case insensitive; escape regex related chars -R4to0 (2 November 2020)
             for (let target of this.cached) {
                 if (reg.test(target.name)) return target;
             }
