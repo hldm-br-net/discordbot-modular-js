@@ -46,7 +46,9 @@ process.on("unhandledRejection", err => { // maybe use uncaughtException?
         if (g_issafe) BotInstance.bot.users.cache.get(BotInstance.botconfig.owneruid).send(err.stack); // Send stack to owner
     }
     catch (error) {
-        process.exit();
+        console.log(`Failed to send error stack to owner.`);
+        console.log(error);
+        //process.exit();
     }
 });
 
