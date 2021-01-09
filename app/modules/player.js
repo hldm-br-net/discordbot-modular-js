@@ -98,7 +98,7 @@ module.exports = class scsplr {
 
         let playerdata = [];
 
-        await msg.channel.startTyping();
+        msg.channel.startTyping();
         //let startms = utils.GetTimeMS();
         
         // HACK: Replace thumbsup emoji with :1: because mobile converts :1: to it
@@ -110,7 +110,10 @@ module.exports = class scsplr {
         let sqlitems = utils.GetTimeMS();
 
         playerdata["stats"] = await this.QueryPlayer(args); // Process player data
-        if (!playerdata.stats) { msg.channel.stopTyping(); return msg.channel.send(this.multilang('ML_PLAYER_NOTFOUND')); }
+        if (!playerdata.stats) {
+            setTimeout(() => { msg.channel.stopTyping() }, 3 * 1000);
+            return msg.channel.send(this.multilang('ML_PLAYER_NOTFOUND'));
+        }
 
         sqlitems = utils.GetTimeMS() - sqlitems;
 
@@ -174,7 +177,7 @@ module.exports = class scsplr {
         //embed.setFooter(`${this.multilang('ML_PLAYER_QUERYTIME', { time: utils.GetTimeMS() - startms })} ${(this.cachedresult && this.sapicached) ? `${this.multilang('ML_PLAYER_CACHEMSG', { timesec: this.nextcache - utils.GetUnixTime() })}.` : '.'} ${this.multilang('ML_PLAYER_LASTUPDATE')}`);
         embed.setFooter(`DB query: ${sqlitems}ms, Steam API: ${sapims}ms${(this.cachedresult && this.sapicached) ? `, ${this.multilang('ML_PLAYER_CACHEMSG', { timesec: this.nextcache - utils.GetUnixTime() })}.` : '.'} ${this.multilang('ML_PLAYER_LASTUPDATE')}`);
 
-        msg.channel.stopTyping();
+        setTimeout(() => { msg.channel.stopTyping() }, 3 * 1000);
         return msg.channel.send({ embed });
 
     }
