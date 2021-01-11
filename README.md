@@ -1,4 +1,4 @@
-# Discord bot made for HLDM-BR.NET community.
+# Multi-purpose bot made for HLDM-BR.NET community.
 
 Yet another modular discord bot made in NodeJS, written for use with HLDM-BR.NET servers.
 
@@ -12,11 +12,18 @@ Base:
 - [multi-lang](https://www.npmjs.com/package/multi-lang)
 
 Modules:
-- No external dependencies required (load.js, reload.js, unload.js)
+- player.js: [better-sqlite3](https://www.npmjs.com/package/better-sqlite3), [steamapi](https://www.npmjs.com/package/steamapi), [steamid](https://www.npmjs.com/package/steamid)
+- tts.js: [fluent-ffmpeg](https://www.npmjs.com/package/fluent-ffmpeg), [request-promise-native](https://www.npmjs.com/package/request-promise-native), [request](https://www.npmjs.com/package/request), [stream-buffers](https://www.npmjs.com/package/stream-buffers)
+
+
+- load.js, ping.js, reload.js, unload.js: No external dependencies required
 
 
 ## Included commands/modules
- - load.js/unload.js/reload.js: Loading/Unloading/Reloading of modules on the fly with "!load filename", "!unload filename" and "!reload filename" commands.
+ - load.js/unload.js/reload.js: Loading/Unloading/Reloading of modules on the fly with "!load filename", "!unload filename" and "!reload filename" commands. This is also known as "Hot-module reload".
+ - ping.js: Ping/pong to test latency between the bot and Discord gateway.
+ - player.js: To be used with @incognico's [svenstats](https://github.com/incognico/svenstats) log parser for Sven Co-op
+ - tts.js: Wrapper for @TETTYS' [SAPI4](https://github.com/TETYYS/SAPI4) server.
 
 #
 `
