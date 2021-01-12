@@ -78,7 +78,7 @@ const FormatTime = seconds => {
  */
 const GetLocalDate = () => {
     const date = new Date();
-    var ten = function (i) {
+    const ten = (i) => {
         return (i < 10 ? '0' : '') + i;
     },
         YYYY = date.getFullYear(),
@@ -149,7 +149,7 @@ const printmsg = (msg, level = 1) => {
  * Custom emojis
  * 
  * What is escaped:
- * `_*~
+ * `_*~>
  * 
  * What is removed:
  * Any unicode character (disabled for now)
@@ -167,11 +167,11 @@ const ResolveStuff = (bot, guildid, msgcontent, markdown = true, thing = false) 
     const ChnlRgx = /<#(\d+?)>/; // Channel names
     const RoleRgx = /<@&(\d+?)>/; // Roles
     const EmojRgx = /<(:.+?:)\d+?>/g; // Custom emojis. {2,32} for name limits
-    const DiMdRgx = /(\`|\_|\*|\~)/g; // Discord markdown codes
+    const DiMdRgx = /(\`|\_|\*|\~|\>)/g; // Discord markdown codes
     //const UnChRgx = /[^\x00-\x7F]/g; // Unicode chars
 
     let resolved = msgcontent;
-    let guild = bot.guilds.get(guildid);
+    const guild = bot.guilds.cache.get(guildid);
 
     if (guild) {
         // User/nick
@@ -182,13 +182,14 @@ const ResolveStuff = (bot, guildid, msgcontent, markdown = true, thing = false) 
 
         // Roles
         while (RoleRgx.exec(resolved)) {
-            resolved = resolved.replace(RoleRgx, function (rl) { return (thing ? '@' : '') + guild.roles.get(rl.replace(RoleRgx, '$1')).name; })
+            resolved = resolved.replace(RoleRgx, function (rl) { return (thing ? '@' : '') + guild.roles.cache.get(rl.replace(RoleRgx, '$1')).name; })
         }
-    }
 
-    // Channel names
-    while (ChnlRgx.exec(resolved)) {
-        resolved = resolved.replace(ChnlRgx, function (cn) { return (thing ? '#' : '') + bot.channels.get(cn.replace(ChnlRgx, '$1')).name; })
+        // Channel names
+        while (ChnlRgx.exec(resolved)) {
+            resolved = resolved.replace(ChnlRgx, function (cn) { return (thing ? '#' : '') + (bot.channels.cache.get(cn.replace(ChnlRgx, '$1')) ? bot.channels.cache.get(cn.replace(ChnlRgx, '$1')).name : '$1'); });
+        }
+
     }
 
     resolved = resolved.replace(EmojRgx, '$1'); // Custom emojis
