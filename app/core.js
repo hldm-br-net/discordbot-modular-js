@@ -245,11 +245,11 @@ module.exports = class Bot {
 
             // Role check
             if (command.allowedroles && command.allowedroles.length > 0)
-                if (msg.member.roles.some(r => command.allowedroles.includes(r.name))) return true;
+                if (msg.member.roles.cache.some(r => command.allowedroles.includes(r.name))) return true;
 
             // Wankers
             if (command.denyroles && command.denyroles.length > 0)
-                if (msg.member.roles.some(r => command.denyroles.includes(r.name))) return false;
+                if (msg.member.roles.cache.some(r => command.denyroles.includes(r.name))) return false;
 
             // Not in the allowed list
             if ((command.allowedroles && command.allowedroles.length > 0) || (command.allowedroles && command.allowedroles.length > 0))
