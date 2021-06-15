@@ -1,5 +1,5 @@
 {
-  "name": "hldmbr bot",
+  "name": "hldmbr-bot",
   "engines": {
     "node": ">=12"
   },
